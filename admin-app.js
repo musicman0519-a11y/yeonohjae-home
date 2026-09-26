@@ -477,7 +477,7 @@ var vids = [];
 function renderHome(){
   var H = DB.home;
   $('hEyebrow').value = H.heroEyebrow || ''; $('hTitle').value = H.heroTitle || ''; $('hSub').value = H.heroSub || '';
-  $('hImg').src = H.heroImg || ''; $('hBadgeTop').value = H.heroBadgeTop || ''; $('hBadge').value = H.heroBadge || '';
+  $('hImg').src = H.heroImg || '';
   var st = (H.dietStats || []).concat([['', ''], ['', ''], ['', '']]).slice(0, 3);
   $('hStats').innerHTML = st.map(function(s, i){ return '<div class="rounded-xl border border-line p-2"><input data-s="' + i + '" data-k="0" value="' + esc(s[0]) + '" placeholder="12주" class="h-9 w-full rounded-lg bg-ivory/60 px-2 text-center font-bold"><input data-s="' + i + '" data-k="1" value="' + esc(s[1]) + '" placeholder="기본 프로그램" class="mt-1 h-9 w-full rounded-lg bg-ivory/60 px-2 text-center text-[12px]"></div>'; }).join('');
   $('hVideoTitle').value = H.videoTitle || '';
@@ -505,7 +505,7 @@ window.saveHome = function(){
   readVids();
   var H = DB.home;
   H.heroEyebrow = $('hEyebrow').value.trim(); H.heroTitle = $('hTitle').value.trim(); H.heroSub = $('hSub').value.trim();
-  H.heroImg = srcOf('hImg'); H.heroBadgeTop = $('hBadgeTop').value.trim(); H.heroBadge = $('hBadge').value.trim();
+  H.heroImg = srcOf('hImg');
   var st = [['', ''], ['', ''], ['', '']];
   $('hStats').querySelectorAll('input').forEach(function(x){ st[+x.dataset.s][+x.dataset.k] = x.value.trim(); });
   H.dietStats = st.filter(function(s){ return s[0] || s[1]; });

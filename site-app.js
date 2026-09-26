@@ -89,7 +89,7 @@
 
   /* ---------- 첫 화면 ---------- */
   setT('heroEyebrow', H.heroEyebrow); setH('heroTitle', tt(H.heroTitle)); setH('heroSub', nl(H.heroSub));
-  setI('heroImg', H.heroImg); setT('heroBadgeTop', H.heroBadgeTop); setH('heroBadge', nl(H.heroBadge));
+  setI('heroImg', H.heroImg);
 
   /* ---------- 공통 카드 조각 ---------- */
   var RV = function(i, step){ return i ? ' style="transition-delay:.' + String(Math.min(i * (step || 7), 30)).padStart(2, '0') + 's"' : ''; };

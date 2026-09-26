@@ -44,7 +44,7 @@
     heroEyebrow: 'Yeonohjae Oriental Clinic · Hwajeong',
     heroTitle: '천편일률적인\n약이 아닙니다\n*단 한 첩*의 약도\n맞춤형으로 다립니다',
     heroSub: '체질과 증상을 먼저 살피고, 그날의 몸에 맞는 처방을 짓습니다.\n혼자 가는 길이 아닌, 한의사가 함께합니다.',
-    heroImg: PIC('yeonohjae-tea-hero', 900, 1080),
+    heroImg: PIC('yeonohjae-tea-hero', 1920, 1080),
     heroBadgeTop: 'Since — 진심으로 짓는 처방',
     heroBadge: '우리는 단순히 처방만 하지 않습니다\n환자와 관계를 만듭니다',
     dietStats: [['12주', '기본 프로그램'], ['1:1', '주치의 관리'], ['맞춤', '체질별 처방']],

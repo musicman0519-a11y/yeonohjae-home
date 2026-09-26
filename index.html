@@ -95,6 +95,11 @@
     .nav-link:hover::after, .nav-link.active::after { right:0; }
 
     [hidden] { display: none !important; }
+    /* 메인 배너: 강조 글씨는 밝은 초록 */
+    .hero-title .text-rosewood-deep { color: #C8DDB9; }
+    @keyframes heroZoom { from { transform: scale(1.06); } to { transform: scale(1); } }
+    .hero-img { animation: heroZoom 8s cubic-bezier(.16,1,.3,1) both; }
+    @media (prefers-reduced-motion: reduce) { .hero-img { animation: none; } }
     html.yj-loading body { opacity: 0; }
     /* 게시글 본문 */
     .yo-body { font-size: 15px; line-height: 1.85; color: #2F343A; word-break: keep-all; }
@@ -150,48 +155,34 @@
   </nav>
 </header>
 
-<!-- ===== 1. HERO — editorial split ===== -->
-<section id="home" class="relative z-10">
-  <div class="mx-auto grid max-w-7xl grid-cols-1 items-center gap-10 px-4 py-16 sm:px-6 md:grid-cols-[1.05fr_.95fr] md:py-24 lg:px-8 lg:py-28">
-    <div>
-      <p id="heroEyebrow" class="reveal text-[12.5px] font-semibold uppercase tracking-[0.26em] text-rosewood">Yeonohjae Oriental Clinic · Hwajeong</p>
-      <h1 id="heroTitle" class="reveal break-keep mt-6 text-[38px] font-extrabold leading-[1.18] tracking-snugger sm:text-[46px] lg:text-[56px]" style="transition-delay:.07s">
-        천편일률적인<br>
-        약이 아닙니다<br>
-        <span class="text-rosewood-deep">단 한 첩</span>의 약도<br>
-        맞춤형으로 다립니다
+<!-- ===== 1. HERO — 전체 화면 사진 배너 ===== -->
+<section id="home" class="relative z-10 overflow-hidden bg-pine">
+  <img id="heroImg" src="https://picsum.photos/seed/yeonohjae-tea-hero/1920/1080" alt="연오재한의원" class="hero-img absolute inset-0 h-full w-full object-cover" decoding="async" fetchpriority="high">
+  <div class="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/35 via-black/10 to-black/70"></div>
+  <div class="pointer-events-none absolute inset-0 bg-gradient-to-r from-black/45 via-black/10 to-transparent"></div>
+  <div class="relative mx-auto flex min-h-[600px] max-w-7xl flex-col px-4 pb-10 pt-10 sm:px-6 md:min-h-[calc(100svh-104px)] md:pb-12 md:pt-14 lg:px-8">
+    <p class="reveal flex items-center gap-3 text-[11.5px] font-semibold uppercase tracking-[0.28em] text-white/85 sm:text-[12.5px]">
+      <span class="h-px w-8 bg-white/60"></span><span id="heroEyebrow">Yeonohjae Oriental Clinic · Hwajeong</span>
+    </p>
+    <div class="mt-auto pt-24">
+      <h1 id="heroTitle" class="hero-title reveal break-keep text-[36px] font-extrabold leading-[1.2] tracking-snugger text-white drop-shadow-[0_2px_18px_rgba(0,0,0,.25)] sm:text-[48px] lg:text-[60px]" style="transition-delay:.07s">
+        천편일률적인<br>약이 아닙니다<br><span class="text-rosewood-deep">단 한 첩</span>의 약도<br>맞춤형으로 다립니다
       </h1>
-      <div class="reveal mt-7 flex items-start gap-4" style="transition-delay:.14s">
-        <span class="hairline mt-3 w-12 shrink-0"></span>
-        <p id="heroSub" class="break-keep max-w-[46ch] text-[15.5px] leading-relaxed text-mocha">
-          체질과 증상을 먼저 살피고, 그날의 몸에 맞는 처방을 짓습니다.<br class="hidden sm:block">
-          혼자 가는 길이 아닌, 한의사가 함께합니다.
-        </p>
-      </div>
-      <div class="reveal mt-9 flex flex-wrap items-center gap-3" style="transition-delay:.2s">
-        <a href="#contact" class="cta sig inline-flex h-[52px] items-center gap-2 rounded-full bg-rosewood-deep pl-7 pr-2.5 text-[15px] font-semibold text-ivory shadow-[0_16px_40px_-16px_rgba(59,75,63,.6)]">
-          진료 예약하기
-          <span class="cta-ico sig flex h-9 w-9 items-center justify-center rounded-full bg-white/15">
-            <iconify-icon icon="solar:arrow-right-linear" width="17"></iconify-icon>
-          </span>
+      <p id="heroSub" class="reveal break-keep mt-6 max-w-[52ch] text-[14.5px] font-medium leading-relaxed text-white/85 sm:text-[15.5px]" style="transition-delay:.14s">
+        체질과 증상을 먼저 살피고, 그날의 몸에 맞는 처방을 짓습니다.<br>혼자 가는 길이 아닌, 한의사가 함께합니다.
+      </p>
+      <div class="reveal mt-8 flex flex-wrap items-center gap-3" style="transition-delay:.2s">
+        <a href="#contact" class="cta sig inline-flex h-[52px] items-center gap-2 rounded-lg bg-rosewood-deep px-7 text-[15px] font-semibold text-ivory shadow-[0_16px_40px_-16px_rgba(0,0,0,.6)] hover:bg-rosewood">
+          상담 예약하기 <iconify-icon class="cta-ico sig" icon="solar:arrow-right-linear" width="17"></iconify-icon>
         </a>
-        <a href="#about" class="cta sig inline-flex h-[52px] items-center gap-2 rounded-full border border-rosewood/30 bg-white/60 px-7 text-[15px] font-semibold text-rosewood-deep hover:bg-white">
-          한의원 둘러보기
+        <a href="tel:01043134735" data-tel class="cta sig inline-flex h-[52px] items-center gap-2 rounded-lg border border-white/70 bg-white/5 px-6 text-[15px] font-semibold text-white backdrop-blur-sm hover:bg-white/15">
+          <iconify-icon icon="solar:phone-calling-linear" width="17"></iconify-icon> <span data-phone>010-4313-4735</span>
         </a>
       </div>
-      <div class="reveal mt-10 flex flex-wrap items-center gap-x-7 gap-y-3 text-[12.5px] font-medium text-mocha" style="transition-delay:.26s">
-        <span class="flex items-center gap-1.5"><iconify-icon icon="solar:map-point-linear" width="15" class="text-rosewood"></iconify-icon> <span id="heroNear">화정역 도보 3분</span></span>
-        <a href="tel:01043134735" data-tel class="flex items-center gap-1.5"><iconify-icon icon="solar:phone-calling-linear" width="15" class="text-rosewood"></iconify-icon> <span data-phone>010-4313-4735</span></a>
-        <span class="flex items-center gap-1.5"><iconify-icon icon="solar:clock-circle-linear" width="15" class="text-rosewood"></iconify-icon> <span id="heroHours">평일 09:00–18:00 · 토 09:00–13:00</span></span>
-      </div>
-    </div>
-    <div class="reveal relative" style="transition-delay:.18s">
-      <div class="img-zoom rounded-[2rem] bg-black/5 p-1.5 ring-1 ring-rosewood/10">
-        <img id="heroImg" src="https://picsum.photos/seed/yeonohjae-tea-hero/900/1080" alt="연오재한의원 — 차분한 다도 공간" class="h-[420px] w-full rounded-[calc(2rem-0.375rem)] object-cover md:h-[560px]" decoding="async">
-      </div>
-      <div class="drift absolute -bottom-6 -left-4 rounded-2xl border border-rosewood/10 bg-ivory/90 px-5 py-4 shadow-[0_20px_50px_-20px_rgba(47,52,58,.35)] backdrop-blur-md sm:-left-8">
-        <p id="heroBadgeTop" class="text-[12px] font-semibold uppercase tracking-[0.14em] text-rosewood">Since — 진심으로 짓는 처방</p>
-        <p id="heroBadge" class="break-keep mt-1 text-[13px] font-semibold text-espresso">우리는 단순히 처방만 하지 않습니다<br>환자와 관계를 만듭니다</p>
+      <div class="reveal mt-10 grid grid-cols-2 gap-x-6 gap-y-4 border-t border-white/25 pt-6 sm:grid-cols-3 sm:gap-8 md:flex md:gap-14" style="transition-delay:.26s">
+        <div><p class="text-[10.5px] font-semibold uppercase tracking-[0.2em] text-white/60">Location</p><p id="heroNear" class="mt-1.5 text-[14px] font-semibold text-white">화정역 도보 3분</p></div>
+        <div><p class="text-[10.5px] font-semibold uppercase tracking-[0.2em] text-white/60">Call</p><a href="tel:01043134735" data-tel class="mt-1.5 block text-[14px] font-semibold text-white"><span data-phone>010-4313-4735</span></a></div>
+        <div class="col-span-2 sm:col-span-1"><p class="text-[10.5px] font-semibold uppercase tracking-[0.2em] text-white/60">Hours</p><p id="heroHours" class="mt-1.5 text-[14px] font-semibold text-white">평일 09:00–18:00 · 토 09:00–13:00</p></div>
       </div>
     </div>
   </div>
