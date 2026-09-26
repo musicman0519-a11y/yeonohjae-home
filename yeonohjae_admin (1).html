@@ -1,0 +1,1310 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>연오재한의원 — 홈페이지 어드민</title>
+  <meta name="description" content="연오재한의원 홈페이지 관리자 대시보드">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.min.css">
+  <script src="https://code.iconify.design/iconify-icon/2.3.0/iconify-icon.min.js"></script>
+  <script>
+    tailwind.config = {
+      theme: { extend: {
+        fontFamily: { sans: ['Pretendard','system-ui','sans-serif'] },
+        colors: {
+          ivory:'#F6F3EE', panel:'#FFFFFF', line:'#E7E1D6', linesoft:'#F0EBE2',
+          espresso:'#2F343A', mocha:'#736E66', faint:'#A39B8F',
+          rosewood:{ DEFAULT:'#4A5D4E', deep:'#3B4B3F' },
+          pine:'#243129', pine2:'#1C271F', champagne:'#90A081',
+          good:'#16794A', goodbg:'#E6F4EC', bad:'#C0362C', badbg:'#FBE9E7', warnbg:'#FDF3E3', warn:'#9C6B1F',
+        },
+      } }
+    }
+  </script>
+  <style>
+    body { background:#F6F3EE; }
+    .break-keep { word-break: keep-all; }
+    .tnum { font-variant-numeric: tabular-nums; }
+    .sig { transition: all .35s cubic-bezier(.16,1,.3,1); }
+    input:focus-visible, button:focus-visible, a:focus-visible, select:focus-visible, textarea:focus-visible { outline:2px solid #4A5D4E; outline-offset:1px; }
+    .view { display:none; }
+    .view.on { display:block; animation: vin .45s cubic-bezier(.16,1,.3,1); }
+    @keyframes vin { from { opacity:0; transform: translateY(.6rem); } to { opacity:1; transform:none; } }
+    .side-link.on { background: rgba(144,160,129,.16); color:#F3EEE7; }
+    .side-link.on iconify-icon { color:#90A081; }
+    .sub-link.on { color:#F3EEE7; background: rgba(144,160,129,.12); }
+    .ftab.on { color:#3B4B3F; border-color:#3B4B3F; }
+    .toggle { width:40px; height:22px; border-radius:999px; background:#D8D1C4; position:relative; cursor:pointer; transition:background .3s; border:none; }
+    .toggle::after { content:""; position:absolute; top:3px; left:3px; width:16px; height:16px; border-radius:999px; background:#fff; transition:transform .3s cubic-bezier(.16,1,.3,1); box-shadow:0 1px 3px rgba(0,0,0,.2); }
+    .toggle.on { background:#4A5D4E; }
+    .toggle.on::after { transform: translateX(18px); }
+    .bar { transition: height .8s cubic-bezier(.16,1,.3,1); }
+    dialog::backdrop { background: rgba(36,49,41,.45); backdrop-filter: blur(3px); }
+  </style>
+</head>
+<body class="font-sans text-espresso antialiased">
+
+<div class="flex min-h-[100dvh]">
+
+  <!-- ===== SIDEBAR ===== -->
+  <aside class="fixed inset-y-0 left-0 z-40 flex w-[248px] -translate-x-full flex-col bg-pine text-[#B9C3BA] transition-transform duration-300 lg:static lg:translate-x-0" id="sidebar">
+    <div class="flex items-center gap-2.5 px-5 pb-5 pt-6">
+      <span class="flex h-9 w-9 items-center justify-center rounded-xl bg-champagne/20 text-champagne">
+        <iconify-icon icon="solar:leaf-bold" width="18"></iconify-icon>
+      </span>
+      <div class="leading-none">
+        <p class="text-[14.5px] font-extrabold text-ivory">연오재한의원</p>
+        <p class="mt-1 text-[10px] font-semibold uppercase tracking-[0.22em] text-[#7E8B80]">홈페이지 어드민</p>
+      </div>
+    </div>
+
+    <nav class="flex-1 overflow-y-auto px-3 pb-4 text-[13.5px] font-medium">
+      <a href="#" data-view="dash" class="side-link sig on flex items-center gap-2.5 rounded-xl px-3 py-2.5 hover:bg-white/5"><iconify-icon icon="solar:widget-4-linear" width="17"></iconify-icon> 홈</a>
+
+      <details open class="group/menu">
+        <summary class="sig flex cursor-pointer list-none items-center justify-between rounded-xl px-3 py-2.5 hover:bg-white/5">
+          <span class="flex items-center gap-2.5"><iconify-icon icon="solar:magic-stick-3-linear" width="17"></iconify-icon> 콘텐츠</span>
+          <iconify-icon icon="solar:alt-arrow-down-linear" width="14" class="transition-transform group-open/menu:rotate-180"></iconify-icon>
+        </summary>
+        <div class="mb-1 ml-4 space-y-0.5 border-l border-white/10 pl-3 text-[13px]">
+          <a href="#" data-view="menus" class="side-link sig block rounded-lg px-3 py-2 hover:bg-white/5">상단 메뉴 관리</a>
+          <a href="#" data-view="posts" class="side-link sig block rounded-lg px-3 py-2 hover:bg-white/5">게시글 관리</a>
+          <a href="#" data-view="custom" class="side-link sig block rounded-lg px-3 py-2 hover:bg-white/5">맞춤 콘텐츠</a>
+          <a href="#" data-view="popup" class="side-link sig block rounded-lg px-3 py-2 hover:bg-white/5">팝업 설정</a>
+        </div>
+      </details>
+
+      <a href="#" data-view="members" class="side-link sig flex items-center gap-2.5 rounded-xl px-3 py-2.5 hover:bg-white/5"><iconify-icon icon="solar:users-group-rounded-linear" width="17"></iconify-icon> 회원 관리</a>
+
+      <details open class="group/menu">
+        <summary class="sig flex cursor-pointer list-none items-center justify-between rounded-xl px-3 py-2.5 hover:bg-white/5">
+          <span class="flex items-center gap-2.5"><iconify-icon icon="solar:stethoscope-linear" width="17"></iconify-icon> 진료 관리</span>
+          <iconify-icon icon="solar:alt-arrow-down-linear" width="14" class="transition-transform group-open/menu:rotate-180"></iconify-icon>
+        </summary>
+        <div class="mb-1 ml-4 space-y-0.5 border-l border-white/10 pl-3 text-[13px]">
+          <a href="#" data-view="orders" class="side-link sig block rounded-lg px-3 py-2 hover:bg-white/5">진료 및 배송 관리</a>
+          <a href="#" data-view="quick" class="side-link sig block rounded-lg px-3 py-2 hover:bg-white/5">빠른 상담</a>
+        </div>
+      </details>
+
+      <details open class="group/menu">
+        <summary class="sig flex cursor-pointer list-none items-center justify-between rounded-xl px-3 py-2.5 hover:bg-white/5">
+          <span class="flex items-center gap-2.5"><iconify-icon icon="solar:box-linear" width="17"></iconify-icon> 상품 관리</span>
+          <iconify-icon icon="solar:alt-arrow-down-linear" width="14" class="transition-transform group-open/menu:rotate-180"></iconify-icon>
+        </summary>
+        <div class="mb-1 ml-4 space-y-0.5 border-l border-white/10 pl-3 text-[13px]">
+          <a href="#" data-view="products" class="side-link sig block rounded-lg px-3 py-2 hover:bg-white/5">상품 등록·수정</a>
+          <a href="#" data-view="generic" data-title="진료 예약 등록·수정" class="side-link sig block rounded-lg px-3 py-2 hover:bg-white/5">진료 예약 등록·수정</a>
+          <a href="#" data-view="su" class="side-link sig block rounded-lg px-3 py-2 hover:bg-white/5">수(壽) 멤버스 상품 연동</a>
+          <a href="#" data-view="generic" data-title="린다이어트 상품 연동" class="side-link sig block rounded-lg px-3 py-2 hover:bg-white/5">린다이어트 상품 연동</a>
+          <a href="#" data-view="generic" data-title="레이시올로지 상품 연동" class="side-link sig block rounded-lg px-3 py-2 hover:bg-white/5">레이시올로지 상품 연동</a>
+          <a href="#" data-view="shipping" class="side-link sig block rounded-lg px-3 py-2 hover:bg-white/5">배송·환불 안내 템플릿</a>
+        </div>
+      </details>
+
+      <details open class="group/menu">
+        <summary class="sig flex cursor-pointer list-none items-center justify-between rounded-xl px-3 py-2.5 hover:bg-white/5">
+          <span class="flex items-center gap-2.5"><iconify-icon icon="solar:chart-2-linear" width="17"></iconify-icon> 통계</span>
+          <iconify-icon icon="solar:alt-arrow-down-linear" width="14" class="transition-transform group-open/menu:rotate-180"></iconify-icon>
+        </summary>
+        <div class="mb-1 ml-4 space-y-0.5 border-l border-white/10 pl-3 text-[13px]">
+          <a href="#" data-view="stats" class="side-link sig block rounded-lg px-3 py-2 hover:bg-white/5">방문 통계</a>
+          <a href="#" data-view="generic" data-title="매출 통계" class="side-link sig block rounded-lg px-3 py-2 hover:bg-white/5">매출 통계</a>
+        </div>
+      </details>
+
+      <a href="#" data-view="generic" data-title="결제" class="side-link sig flex items-center gap-2.5 rounded-xl px-3 py-2.5 hover:bg-white/5"><iconify-icon icon="solar:card-linear" width="17"></iconify-icon> 결제</a>
+      <a href="#" data-view="staff" class="side-link sig flex items-center gap-2.5 rounded-xl px-3 py-2.5 hover:bg-white/5"><iconify-icon icon="solar:shield-user-linear" width="17"></iconify-icon> 직원 계정 관리</a>
+      <a href="#" data-view="generic" data-title="서비스 연동" class="side-link sig flex items-center gap-2.5 rounded-xl px-3 py-2.5 hover:bg-white/5"><iconify-icon icon="solar:link-circle-linear" width="17"></iconify-icon> 서비스 연동</a>
+      <a href="#" data-view="generic" data-title="설정" class="side-link sig flex items-center gap-2.5 rounded-xl px-3 py-2.5 hover:bg-white/5"><iconify-icon icon="solar:settings-linear" width="17"></iconify-icon> 설정</a>
+    </nav>
+
+    <div class="border-t border-white/10 px-3 py-4 text-[12.5px] font-medium">
+      <a href="#" class="sig flex items-center justify-between rounded-xl px-3 py-2 hover:bg-white/5">공지사항 <iconify-icon icon="solar:alt-arrow-right-linear" width="14"></iconify-icon></a>
+      <a href="#" class="sig flex items-center justify-between rounded-xl px-3 py-2 hover:bg-white/5">이용 가이드 (FAQ) <iconify-icon icon="solar:alt-arrow-right-linear" width="14"></iconify-icon></a>
+      <a href="#" class="sig flex items-center justify-between rounded-xl px-3 py-2 hover:bg-white/5">성장센터 <iconify-icon icon="solar:alt-arrow-right-linear" width="14"></iconify-icon></a>
+      <a href="#" class="sig flex items-center justify-between rounded-xl px-3 py-2 hover:bg-white/5">PG 정산 내역 확인 <iconify-icon icon="solar:alt-arrow-right-linear" width="14"></iconify-icon></a>
+      <a href="#" class="sig flex items-center justify-between rounded-xl px-3 py-2 hover:bg-white/5">1:1 문의 <iconify-icon icon="solar:alt-arrow-right-linear" width="14"></iconify-icon></a>
+    </div>
+  </aside>
+
+  <!-- ===== MAIN ===== -->
+  <div class="flex min-w-0 flex-1 flex-col">
+
+    <!-- top bar -->
+    <header class="sticky top-0 z-30 flex items-center justify-between gap-3 border-b border-line bg-ivory/90 px-4 py-3 backdrop-blur-md sm:px-6">
+      <div class="flex items-center gap-2.5">
+        <button type="button" id="sideToggle" class="sig flex h-9 w-9 items-center justify-center rounded-xl border border-line bg-panel text-espresso lg:hidden" aria-label="메뉴 열기">
+          <iconify-icon icon="solar:hamburger-menu-linear" width="18"></iconify-icon>
+        </button>
+        <h1 class="text-[16.5px] font-bold" id="pageTitle">운영 현황</h1>
+      </div>
+      <div class="flex items-center gap-2">
+        <a href="yeonohjae_home.html" target="_blank" class="sig hidden items-center gap-1.5 rounded-full border border-rosewood/25 bg-panel px-4 py-2 text-[12.5px] font-semibold text-rosewood-deep hover:bg-white sm:flex">
+          <iconify-icon icon="solar:square-top-up-linear" width="14"></iconify-icon> 사이트 바로가기
+        </a>
+        <button type="button" class="sig relative flex h-9 w-9 items-center justify-center rounded-full border border-line bg-panel" aria-label="알림">
+          <iconify-icon icon="solar:bell-linear" width="17"></iconify-icon>
+          <span class="absolute -right-0.5 -top-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-rosewood text-[9px] font-bold text-ivory">2</span>
+        </button>
+        <div class="flex items-center gap-2 rounded-full border border-line bg-panel py-1 pl-1 pr-3">
+          <span class="flex h-7 w-7 items-center justify-center rounded-full bg-rosewood/15 text-[11px] font-bold text-rosewood-deep">연오</span>
+          <span class="hidden text-[12.5px] font-semibold sm:block">연오재한의원 (원장님)</span>
+        </div>
+      </div>
+    </header>
+
+    <main class="flex-1 px-4 py-6 sm:px-6 lg:px-8">
+
+
+
+      <!-- ===== VIEW: 준비 중 메뉴 (공통) ===== -->
+      <section class="view" id="view-generic">
+        <div class="flex flex-col items-center justify-center rounded-2xl border border-line bg-panel py-28 text-center">
+          <span class="flex h-16 w-16 items-center justify-center rounded-full bg-linesoft text-faint">
+            <iconify-icon icon="solar:settings-minimalistic-linear" width="28"></iconify-icon>
+          </span>
+          <p class="mt-4 text-[15px] font-bold" id="genericTitle">준비 중</p>
+          <p class="mt-1.5 max-w-md break-keep text-[13px] leading-relaxed text-mocha">이 메뉴는 레퍼런스 구조에 맞춰 자리만 잡아 둔 화면입니다. 필요한 기능 상세(목록 구성, 입력 항목 등)를 알려주시면 이어서 구현해 드립니다.</p>
+        </div>
+      </section>
+
+      <!-- ===== VIEW: 홈 대시보드 (운영 현황) ===== -->
+      <section class="view on" id="view-dash">
+        <div class="flex flex-wrap items-end justify-between gap-3">
+          <div>
+            <h2 class="text-[19px] font-bold" id="dashDate">운영 현황</h2>
+            <p class="mt-1 text-[13px] text-mocha">신규 접수된 상담, 비대면 진료 요청 내역을 확인하세요</p>
+          </div>
+          <button type="button" class="sig flex items-center gap-1.5 rounded-full border border-line bg-panel px-4 py-2 text-[12px] font-semibold text-mocha hover:bg-white" onclick="setDashTime()">
+            <iconify-icon icon="solar:clock-circle-linear" width="14"></iconify-icon> <span id="dashTime"></span> 기준
+            <iconify-icon icon="solar:refresh-linear" width="14"></iconify-icon>
+          </button>
+        </div>
+
+        <div class="mt-6 grid grid-cols-1 gap-6 xl:grid-cols-[1.1fr_.9fr]">
+          <div>
+            <p class="text-[13.5px] font-bold">확인이 필요한 상담 요청</p>
+            <div class="mt-3 space-y-3.5">
+              <div class="flex items-center justify-between rounded-2xl border border-line bg-panel px-6 py-5">
+                <div class="flex items-center gap-4">
+                  <span class="flex h-11 w-11 items-center justify-center rounded-full bg-rosewood/10 text-rosewood-deep"><iconify-icon icon="solar:phone-calling-linear" width="20"></iconify-icon></span>
+                  <div>
+                    <p class="flex items-center gap-1 text-[12.5px] font-semibold text-mocha">빠른상담 요청건 <iconify-icon icon="solar:question-circle-linear" width="13" class="text-faint"></iconify-icon></p>
+                    <p class="tnum mt-0.5 text-[19px] font-extrabold" id="dashQuickCount">0건</p>
+                  </div>
+                </div>
+                <a href="#" class="sig flex items-center gap-1 text-[13px] font-semibold text-rosewood-deep hover:gap-1.5">빠른 상담 목록 <iconify-icon icon="solar:alt-arrow-right-linear" width="15"></iconify-icon></a>
+              </div>
+              <div class="flex items-center justify-between rounded-2xl border border-line bg-panel px-6 py-5">
+                <div class="flex items-center gap-4">
+                  <span class="flex h-11 w-11 items-center justify-center rounded-full bg-rosewood/10 text-rosewood-deep"><iconify-icon icon="solar:smartphone-linear" width="20"></iconify-icon></span>
+                  <div>
+                    <p class="flex items-center gap-1 text-[12.5px] font-semibold text-mocha">비대면 진료 요청건 <iconify-icon icon="solar:question-circle-linear" width="13" class="text-faint"></iconify-icon></p>
+                    <p class="tnum mt-0.5 text-[19px] font-extrabold">0건</p>
+                  </div>
+                </div>
+                <a href="#" class="sig flex items-center gap-1 text-[13px] font-semibold text-rosewood-deep hover:gap-1.5">비대면 진료 목록 <iconify-icon icon="solar:alt-arrow-right-linear" width="15"></iconify-icon></a>
+              </div>
+            </div>
+          </div>
+          <div>
+            <p class="text-[13.5px] font-bold">공지사항</p>
+            <a href="#" class="sig mt-3 flex items-center justify-between rounded-2xl border border-line bg-panel px-6 py-5 hover:bg-white">
+              <span class="text-[13.5px] font-semibold">비대면 진료 지침 <span class="tnum font-medium text-mocha">(25년 12월 2일)</span></span>
+              <iconify-icon icon="solar:alt-arrow-right-linear" width="16" class="text-mocha"></iconify-icon>
+            </a>
+          </div>
+        </div>
+
+        <p class="mt-8 text-[13.5px] font-bold">비대면 진료 현황</p>
+        <div class="mt-3 grid grid-cols-1 gap-4 md:grid-cols-3">
+          <div class="rounded-2xl border border-line bg-panel p-5">
+            <div class="flex items-center gap-3">
+              <span class="flex h-10 w-10 items-center justify-center rounded-full bg-linesoft text-mocha"><iconify-icon icon="solar:user-check-rounded-linear" width="18"></iconify-icon></span>
+              <div><p class="text-[12.5px] font-semibold text-mocha">진료 접수(대기)</p><p class="tnum text-[17px] font-extrabold text-faint">0명</p></div>
+            </div>
+            <p class="mt-4 flex items-start gap-1.5 rounded-xl bg-rosewood/8 px-3.5 py-2.5 text-[12px] font-medium text-rosewood-deep"><iconify-icon icon="solar:chat-square-linear" width="13" class="mt-0.5 shrink-0"></iconify-icon><span class="break-keep">대기 중인 환자를 확인하고 진료를 진행해 주세요.</span></p>
+            <div class="mt-3 flex h-44 items-center justify-center rounded-xl border border-dashed border-line text-[12.5px] text-faint">조건에 해당하는 환자가 없습니다</div>
+          </div>
+          <div class="rounded-2xl border border-line bg-panel p-5">
+            <div class="flex items-center gap-3">
+              <span class="flex h-10 w-10 items-center justify-center rounded-full bg-linesoft text-mocha"><iconify-icon icon="solar:bus-linear" width="18"></iconify-icon></span>
+              <div><p class="text-[12.5px] font-semibold text-mocha">상품 발송 필요</p><p class="tnum text-[17px] font-extrabold text-faint">0명</p></div>
+            </div>
+            <p class="mt-4 flex items-start gap-1.5 rounded-xl bg-rosewood/8 px-3.5 py-2.5 text-[12px] font-medium text-rosewood-deep"><iconify-icon icon="solar:chat-square-linear" width="13" class="mt-0.5 shrink-0"></iconify-icon><span class="break-keep">발송 후, 송장 등록 or 발송 완료 처리 해 주세요.</span></p>
+            <div class="mt-3 flex h-44 items-center justify-center rounded-xl border border-dashed border-line text-[12.5px] text-faint">조건에 해당하는 환자가 없습니다</div>
+          </div>
+          <div class="rounded-2xl border border-line bg-panel p-5">
+            <div class="flex items-center gap-3">
+              <span class="flex h-10 w-10 items-center justify-center rounded-full bg-linesoft text-mocha"><iconify-icon icon="solar:box-linear" width="18"></iconify-icon></span>
+              <div><p class="text-[12.5px] font-semibold text-mocha">픽업 준비 필요</p><p class="tnum text-[17px] font-extrabold text-faint">0명</p></div>
+            </div>
+            <p class="mt-4 flex items-start gap-1.5 rounded-xl bg-rosewood/8 px-3.5 py-2.5 text-[12px] font-medium text-rosewood-deep"><iconify-icon icon="solar:chat-square-linear" width="13" class="mt-0.5 shrink-0"></iconify-icon><span class="break-keep">오늘 한의원으로 픽업 예정입니다. 준비해 주세요.</span></p>
+            <div class="mt-3 flex h-44 items-center justify-center rounded-xl border border-dashed border-line text-[12.5px] text-faint">조건에 해당하는 환자가 없습니다</div>
+          </div>
+        </div>
+
+        <p class="mt-8 text-[13.5px] font-bold">비대면 진료 및 상품 노출 현황</p>
+        <div class="mt-3 grid grid-cols-1 overflow-hidden rounded-2xl border border-line bg-panel md:grid-cols-2 md:divide-x md:divide-linesoft">
+          <a href="#" class="sig flex items-center justify-between px-7 py-6 hover:bg-linesoft/40">
+            <div><p class="text-[13px] font-bold">이번달 매출 <span class="tnum ml-1 text-[11.5px] font-medium text-faint">07.01 ~ 07.27</span></p><p class="tnum mt-1.5 text-[24px] font-extrabold">0원</p></div>
+            <iconify-icon icon="solar:alt-arrow-right-linear" width="17" class="text-mocha"></iconify-icon>
+          </a>
+          <a href="#" class="sig flex items-center justify-between border-t border-linesoft px-7 py-6 hover:bg-linesoft/40 md:border-t-0">
+            <div><p class="text-[13px] font-bold">활성화된 상품</p><p class="tnum mt-1.5 text-[24px] font-extrabold">14개</p></div>
+            <iconify-icon icon="solar:alt-arrow-right-linear" width="17" class="text-mocha"></iconify-icon>
+          </a>
+        </div>
+
+        <div class="mt-6 rounded-2xl border border-line bg-panel p-6">
+          <div class="flex items-center justify-between">
+            <p class="text-[14px] font-bold">매출 추이</p>
+            <span class="flex items-center gap-4 text-[12px] font-semibold text-mocha"><span class="flex items-center gap-1.5"><i class="h-0.5 w-4 rounded bg-champagne"></i>주문수</span><span class="flex items-center gap-1.5"><i class="h-2.5 w-2.5 rounded-sm bg-rosewood/70"></i>매출액</span></span>
+          </div>
+          <div class="mt-5 grid grid-cols-1 gap-4 lg:grid-cols-3">
+            <div class="rounded-xl border border-linesoft p-4">
+              <p class="text-[12.5px] font-bold">일별</p>
+              <div class="relative mt-3 flex h-40 items-end gap-1.5 opacity-40">
+                <div class="w-full rounded-t bg-rosewood/25" style="height:22%"></div><div class="w-full rounded-t bg-rosewood/25" style="height:14%"></div><div class="w-full rounded-t bg-rosewood/25" style="height:38%"></div><div class="w-full rounded-t bg-rosewood/25" style="height:46%"></div><div class="w-full rounded-t bg-rosewood/25" style="height:30%"></div><div class="w-full rounded-t bg-rosewood/25" style="height:26%"></div><div class="w-full rounded-t bg-rosewood/25" style="height:72%"></div><div class="w-full rounded-t bg-rosewood/25" style="height:84%"></div>
+                <p class="absolute inset-0 flex items-center justify-center text-[13px] font-semibold text-mocha opacity-100">매출 데이터가 없습니다</p>
+              </div>
+            </div>
+            <div class="rounded-xl border border-linesoft p-4">
+              <div class="flex items-center justify-between"><p class="text-[12.5px] font-bold">주별 <span class="font-medium text-faint">최근 12주</span></p><iconify-icon icon="solar:maximize-linear" width="14" class="text-faint"></iconify-icon></div>
+              <svg viewBox="0 0 300 160" class="mt-3 w-full" aria-label="주별 매출 추이 — 데이터 없음">
+                <text x="0" y="12" font-size="9" fill="#A39B8F">매출액 (만원)</text><text x="262" y="12" font-size="9" fill="#A39B8F">주문수</text>
+                <g font-size="9" fill="#A39B8F"><text x="8" y="34">100</text><text x="12" y="62">75</text><text x="12" y="90">50</text><text x="12" y="118">25</text><text x="16" y="146">0</text></g>
+                <g stroke="#F0EBE2"><line x1="30" y1="30" x2="285" y2="30"/><line x1="30" y1="58" x2="285" y2="58"/><line x1="30" y1="86" x2="285" y2="86"/><line x1="30" y1="114" x2="285" y2="114"/><line x1="30" y1="142" x2="285" y2="142"/></g>
+                <line x1="30" y1="142" x2="240" y2="142" stroke="#90A081" stroke-width="2"/>
+                <line x1="240" y1="142" x2="285" y2="142" stroke="#90A081" stroke-width="2" stroke-dasharray="3 4"/>
+                <g font-size="8.5" fill="#A39B8F"><text x="30" y="157">05-11</text><text x="95" y="157">06-01</text><text x="160" y="157">06-22</text><text x="215" y="157">07-06</text><text x="263" y="157">07-27</text></g>
+              </svg>
+            </div>
+            <div class="rounded-xl border border-linesoft p-4">
+              <div class="flex items-center justify-between"><p class="text-[12.5px] font-bold">월별 <span class="font-medium text-faint">최근 5개월</span></p><iconify-icon icon="solar:maximize-linear" width="14" class="text-faint"></iconify-icon></div>
+              <svg viewBox="0 0 300 160" class="mt-3 w-full" aria-label="월별 매출 추이 — 데이터 없음">
+                <text x="0" y="12" font-size="9" fill="#A39B8F">매출액 (만원)</text><text x="262" y="12" font-size="9" fill="#A39B8F">주문수</text>
+                <g font-size="9" fill="#A39B8F"><text x="8" y="34">100</text><text x="12" y="62">75</text><text x="12" y="90">50</text><text x="12" y="118">25</text><text x="16" y="146">0</text></g>
+                <g stroke="#F0EBE2"><line x1="30" y1="30" x2="285" y2="30"/><line x1="30" y1="58" x2="285" y2="58"/><line x1="30" y1="86" x2="285" y2="86"/><line x1="30" y1="114" x2="285" y2="114"/><line x1="30" y1="142" x2="285" y2="142"/></g>
+                <line x1="30" y1="142" x2="230" y2="142" stroke="#90A081" stroke-width="2"/>
+                <line x1="230" y1="142" x2="285" y2="142" stroke="#90A081" stroke-width="2" stroke-dasharray="3 4"/>
+                <g font-size="8.5" fill="#A39B8F"><text x="34" y="157">2026-03</text><text x="90" y="157">2026-04</text><text x="146" y="157">2026-05</text><text x="200" y="157">2026-06</text><text x="252" y="157">2026-07</text></g>
+              </svg>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== VIEW: 상단 메뉴 관리 ===== -->
+      <section class="view" id="view-menus">
+        <div class="flex flex-wrap items-end justify-between gap-3">
+          <div>
+            <h2 class="text-[17px] font-bold">상단 메뉴 관리</h2>
+            <p class="mt-1 text-[13px] text-mocha">게시판 순서는 홈페이지 메뉴 순서와 동일해요</p>
+          </div>
+          <div class="flex gap-2">
+            <button type="button" class="sig rounded-full border border-line bg-panel px-4 py-2 text-[12.5px] font-semibold hover:bg-white"><iconify-icon icon="solar:monitor-linear" width="14" class="mr-1 align-[-2px]"></iconify-icon>미리보기</button>
+            <button type="button" class="sig rounded-full bg-rosewood-deep px-4 py-2 text-[12.5px] font-semibold text-ivory hover:bg-pine">+ 게시판 생성</button>
+          </div>
+        </div>
+
+        <div class="mt-4 flex flex-wrap items-center justify-end gap-3">
+          <span class="tnum text-[12.5px] font-semibold text-mocha">총 <b class="text-espresso">10</b>개</span>
+          <label class="relative block">
+            <iconify-icon icon="solar:magnifer-linear" width="15" class="absolute left-3 top-1/2 -translate-y-1/2 text-faint"></iconify-icon>
+            <input type="search" placeholder="검색어를 입력해 주세요" class="w-64 rounded-xl border border-line bg-panel py-2 pl-9 pr-3 text-[12.5px] placeholder:text-faint">
+          </label>
+          <select class="rounded-xl border border-line bg-panel px-3 py-2 text-[12.5px] font-semibold"><option>게시판명</option><option>URL명</option></select>
+        </div>
+
+        <div class="mt-4 overflow-x-auto rounded-2xl border border-line bg-panel">
+          <table class="w-full min-w-[900px] text-left text-[13px]">
+            <thead>
+              <tr class="border-b border-linesoft text-[11.5px] font-semibold uppercase tracking-wide text-faint">
+                <th class="w-8 px-3 py-3"></th>
+                <th class="w-10 px-2 py-3"><input type="checkbox" class="h-4 w-4 rounded border-line accent-[#3B4B3F]"></th>
+                <th class="px-2 py-3">순서</th><th class="px-2 py-3">게시판명</th><th class="px-2 py-3">게시판 속성</th><th class="px-2 py-3">URL명</th><th class="px-2 py-3">게시글 수</th><th class="px-2 py-3">활성화</th><th class="px-4 py-3 text-right">관리</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-linesoft" id="menuBody"></tbody>
+          </table>
+        </div>
+      </section>
+
+
+      <!-- ===== VIEW: 맞춤 콘텐츠 ===== -->
+      <section class="view" id="view-custom">
+        <div>
+          <h2 class="text-[17px] font-bold">맞춤 콘텐츠</h2>
+          <p class="mt-1 break-keep text-[13px] text-mocha">콘텐츠 팀이 원장님을 위해 작성한 게시글이에요. 검토 후 게시해 보세요.</p>
+        </div>
+
+        <div class="mt-5 flex flex-wrap items-center justify-between gap-3">
+          <div class="flex flex-wrap gap-2 text-[12.5px] font-semibold">
+            <select class="rounded-xl border border-line bg-panel px-3 py-2"><option>게시 이력 전체</option><option>게시 전</option><option>게시 완료</option></select>
+            <select class="rounded-xl border border-line bg-panel px-3 py-2"><option>추천 게시판 전체</option><option>한의원 소개</option><option>집중 진료</option><option>다이어트 치료</option></select>
+            <select class="rounded-xl border border-line bg-panel px-3 py-2"><option>키워드 0개 선택</option></select>
+          </div>
+          <div class="flex items-center gap-3">
+            <span class="tnum text-[12.5px] font-semibold text-mocha">총 <b class="text-espresso" id="customCount">14</b>개</span>
+            <label class="relative block">
+              <iconify-icon icon="solar:magnifer-linear" width="15" class="absolute left-3 top-1/2 -translate-y-1/2 text-faint"></iconify-icon>
+              <input id="customSearch" type="search" placeholder="제목을 검색해 주세요" class="w-56 rounded-xl border border-line bg-panel py-2 pl-9 pr-3 text-[12.5px] placeholder:text-faint sm:w-72">
+            </label>
+          </div>
+        </div>
+
+        <div class="mt-4 overflow-x-auto rounded-2xl border border-line bg-panel">
+          <table class="w-full min-w-[980px] text-left text-[13px]">
+            <thead>
+              <tr class="border-b border-linesoft text-[11.5px] font-semibold uppercase tracking-wide text-faint">
+                <th class="px-4 py-3">전달일</th><th class="px-2 py-3">게시글 제목</th><th class="px-2 py-3">게시 이력</th><th class="px-2 py-3">추천 게시판</th><th class="px-2 py-3">키워드</th><th class="px-4 py-3 text-right">액션</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-linesoft" id="customBody"></tbody>
+          </table>
+          <div class="flex items-center justify-between border-t border-linesoft px-4 py-3 text-[12.5px] font-semibold text-mocha">
+            <select class="rounded-lg border border-line bg-panel px-2.5 py-1.5"><option>25개</option><option>50개</option></select>
+            <span class="flex items-center gap-2">
+              <button class="sig flex items-center gap-1 rounded-lg border border-line px-3 py-1.5 text-faint" disabled><iconify-icon icon="solar:alt-arrow-left-linear" width="13"></iconify-icon> 이전</button>
+              <span class="flex h-8 w-8 items-center justify-center rounded-lg bg-rosewood-deep text-ivory">1</span>
+              <button class="sig flex items-center gap-1 rounded-lg border border-line px-3 py-1.5 hover:bg-linesoft">다음 <iconify-icon icon="solar:alt-arrow-right-linear" width="13"></iconify-icon></button>
+            </span>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== VIEW: 팝업 설정 ===== -->
+      <section class="view" id="view-popup">
+        <h2 class="text-[17px] font-bold">팝업 설정</h2>
+        <div class="mt-5 grid grid-cols-1 gap-5 lg:grid-cols-[280px_1fr]">
+          <div class="rounded-2xl border border-line bg-panel p-5">
+            <div class="flex items-center justify-between">
+              <p class="text-[14px] font-bold">팝업 목록</p>
+              <button type="button" class="sig rounded-full bg-rosewood-deep px-3.5 py-1.5 text-[12px] font-semibold text-ivory hover:bg-pine">+ 팝업 그룹 추가</button>
+            </div>
+            <p class="mt-4 flex items-center gap-1.5 text-[11.5px] font-semibold uppercase tracking-wide text-faint"><iconify-icon icon="solar:document-linear" width="13"></iconify-icon> 전체 목록</p>
+            <button class="mt-2 flex w-full items-center justify-between rounded-xl border border-rosewood/30 bg-rosewood/8 px-4 py-3 text-left">
+              <span class="text-[13px] font-bold text-rosewood-deep">기본 팝업 그룹 1</span>
+              <span class="rounded-full bg-linesoft px-2.5 py-1 text-[10.5px] font-bold text-mocha">비활성화</span>
+            </button>
+          </div>
+
+          <form class="rounded-2xl border border-line bg-panel p-6 sm:p-7" onsubmit="return false;">
+            <p class="text-[14px] font-bold">팝업 그룹 설정</p>
+            <div class="mt-5 grid grid-cols-1 gap-4 md:grid-cols-2">
+              <label class="block text-[12.5px] font-bold">팝업 그룹명 <span class="text-bad">*</span>
+                <input type="text" value="기본 팝업 그룹 1" class="mt-2 h-[46px] w-full rounded-xl border border-line bg-ivory/50 px-4 text-[13px] font-medium">
+              </label>
+              <label class="block text-[12.5px] font-bold">팝업 노출 위치 <span class="text-bad">*</span>
+                <select class="mt-2 h-[46px] w-full rounded-xl border border-line bg-ivory/50 px-3.5 text-[13px] font-medium">
+                  <option>비대면 진료</option><option>홈</option><option>원내 상품</option><option>진료 예약</option>
+                </select>
+              </label>
+            </div>
+
+            <div class="mt-6 flex flex-wrap items-center gap-x-10 gap-y-4">
+              <div class="flex items-center gap-4">
+                <span class="text-[12.5px] font-bold">팝업 활성화 <span class="text-bad">*</span></span>
+                <div class="flex overflow-hidden rounded-xl border border-line" id="popupActive">
+                  <button type="button" data-v="on" class="sig px-4 py-2 text-[12.5px] font-semibold text-mocha hover:bg-linesoft">활성화</button>
+                  <button type="button" data-v="off" class="sig bg-rosewood-deep px-4 py-2 text-[12.5px] font-semibold text-ivory">비활성화</button>
+                </div>
+              </div>
+              <div class="flex items-center gap-4">
+                <span class="text-[12.5px] font-bold">노출 기기 <span class="text-bad">*</span></span>
+                <label class="flex items-center gap-1.5 text-[13px] font-medium"><input type="checkbox" checked class="h-4 w-4 rounded accent-[#3B4B3F]"> PC</label>
+                <label class="flex items-center gap-1.5 text-[13px] font-medium"><input type="checkbox" checked class="h-4 w-4 rounded accent-[#3B4B3F]"> 태블릿</label>
+                <label class="flex items-center gap-1.5 text-[13px] font-medium"><input type="checkbox" checked class="h-4 w-4 rounded accent-[#3B4B3F]"> 모바일</label>
+              </div>
+            </div>
+
+            <p class="mt-6 flex items-center gap-2 rounded-xl border border-line bg-ivory/60 px-4 py-3 text-[12.5px] font-medium text-mocha">
+              <iconify-icon icon="solar:info-circle-linear" width="15"></iconify-icon> 팝업은 지정된 순서대로 홈페이지에 노출 됩니다.
+            </p>
+
+            <div class="mt-5 rounded-2xl border border-line">
+              <div class="flex items-center justify-between border-b border-linesoft px-5 py-4">
+                <p class="text-[13px] font-bold">팝업 추가</p>
+                <button type="button" class="sig rounded-full border border-rosewood/30 px-3.5 py-1.5 text-[12px] font-semibold text-rosewood-deep hover:bg-rosewood/5">+ 팝업 추가</button>
+              </div>
+              <div class="flex flex-col items-center justify-center py-16 text-center">
+                <p class="text-[13.5px] font-bold">팝업이 없습니다.</p>
+                <p class="mt-1 text-[12.5px] text-mocha">팝업을 추가해 주세요.</p>
+              </div>
+            </div>
+
+            <div class="mt-5 grid grid-cols-2 gap-3">
+              <button type="button" class="sig h-[48px] rounded-full border border-line text-[13.5px] font-semibold text-mocha hover:bg-linesoft">삭제</button>
+              <button type="submit" class="sig h-[48px] rounded-full bg-rosewood-deep text-[13.5px] font-semibold text-ivory hover:bg-pine">저장</button>
+            </div>
+          </form>
+        </div>
+      </section>
+
+      <!-- ===== VIEW: 게시글 관리 ===== -->
+      <section class="view" id="view-posts">
+        <div class="flex flex-wrap items-center justify-between gap-3">
+          <div class="flex flex-wrap gap-2 text-[13px] font-semibold" id="postTabs">
+            <button data-cat="all" class="ftab on sig rounded-full border border-line bg-panel px-4 py-1.5 text-mocha">전체 <span class="tnum ml-1 rounded-full bg-rosewood/10 px-1.5 text-[11px] text-rosewood-deep">19</span></button>
+            <button data-cat="event" class="ftab sig rounded-full border border-line bg-panel px-4 py-1.5 text-mocha">진행 중인 이벤트 <span class="tnum ml-1 text-[11px] text-faint">1</span></button>
+            <button data-cat="review" class="ftab sig rounded-full border border-line bg-panel px-4 py-1.5 text-mocha">진료 후기 <span class="tnum ml-1 text-[11px] text-faint">0</span></button>
+            <button data-cat="diet" class="ftab sig rounded-full border border-line bg-panel px-4 py-1.5 text-mocha">다이어트 치료 <span class="tnum ml-1 text-[11px] text-faint">2</span></button>
+            <button data-cat="focus" class="ftab sig rounded-full border border-line bg-panel px-4 py-1.5 text-mocha">집중 진료 <span class="tnum ml-1 text-[11px] text-faint">3</span></button>
+            <button data-cat="treat" class="ftab sig rounded-full border border-line bg-panel px-4 py-1.5 text-mocha">한방 치료 <span class="tnum ml-1 text-[11px] text-faint">8</span></button>
+            <button data-cat="about" class="ftab sig rounded-full border border-line bg-panel px-4 py-1.5 text-mocha">한의원 소개 <span class="tnum ml-1 text-[11px] text-faint">2</span></button>
+            <button data-cat="notice" class="ftab sig rounded-full border border-line bg-panel px-4 py-1.5 text-mocha">공지사항 <span class="tnum ml-1 text-[11px] text-faint">3</span></button>
+          </div>
+          <div class="flex gap-2">
+            <button type="button" class="sig hidden rounded-full border border-line bg-panel px-4 py-2 text-[12.5px] font-semibold text-espresso hover:bg-white md:block">블로그 글 가져오기</button>
+            <button type="button" class="sig hidden rounded-full border border-line bg-panel px-4 py-2 text-[12.5px] font-semibold text-espresso hover:bg-white md:block"># 태그 관리</button>
+            <button type="button" class="sig rounded-full bg-rosewood-deep px-4 py-2 text-[12.5px] font-semibold text-ivory hover:bg-pine">+ 게시글 작성</button>
+          </div>
+        </div>
+
+        <div class="mt-4 flex flex-wrap items-center justify-between gap-3">
+          <label class="flex items-center gap-2 text-[12.5px] font-semibold text-mocha">게시 상태
+            <select class="rounded-xl border border-line bg-panel px-3 py-2 text-[12.5px] font-semibold text-espresso"><option>전체</option><option>게시 중</option><option>비공개</option></select>
+          </label>
+          <div class="flex items-center gap-3">
+            <span class="tnum text-[12.5px] font-semibold text-mocha">총 <b class="text-espresso" id="postCount">19</b>개</span>
+            <label class="relative block">
+              <iconify-icon icon="solar:magnifer-linear" width="15" class="absolute left-3 top-1/2 -translate-y-1/2 text-faint"></iconify-icon>
+              <input id="postSearch" type="search" placeholder="검색어를 입력해 주세요" class="w-56 rounded-xl border border-line bg-panel py-2 pl-9 pr-3 text-[12.5px] placeholder:text-faint sm:w-72">
+            </label>
+          </div>
+        </div>
+
+        <div class="mt-4 overflow-x-auto rounded-2xl border border-line bg-panel">
+          <table class="w-full min-w-[860px] text-left text-[13px]">
+            <thead>
+              <tr class="border-b border-linesoft text-[11.5px] font-semibold uppercase tracking-wide text-faint">
+                <th class="px-4 py-3 w-10"><input type="checkbox" class="h-4 w-4 rounded border-line accent-[#3B4B3F]"></th>
+                <th class="px-2 py-3">게시글 제목</th>
+                <th class="px-2 py-3">발행일</th>
+                <th class="px-2 py-3">조회수</th>
+                <th class="px-2 py-3">게시상태</th>
+                <th class="px-2 py-3">게시판 위치</th>
+                <th class="px-4 py-3 text-right">관리</th>
+              </tr>
+            </thead>
+            <tbody id="postBody" class="divide-y divide-linesoft"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ===== VIEW: 회원 관리 ===== -->
+      <section class="view" id="view-members">
+        <div class="flex flex-wrap items-center justify-between gap-3">
+          <span class="tnum text-[13px] font-semibold text-mocha">총 <b class="text-espresso">2</b>건</span>
+          <div class="flex items-center gap-2">
+            <select class="rounded-xl border border-line bg-panel px-3 py-2 text-[12.5px] font-semibold"><option>사용자명</option><option>전화번호</option><option>이메일</option></select>
+            <label class="relative block">
+              <iconify-icon icon="solar:magnifer-linear" width="15" class="absolute left-3 top-1/2 -translate-y-1/2 text-faint"></iconify-icon>
+              <input type="search" placeholder="사용자명 검색" class="w-48 rounded-xl border border-line bg-panel py-2 pl-9 pr-3 text-[12.5px] placeholder:text-faint">
+            </label>
+            <button type="button" class="sig rounded-xl border border-line bg-panel px-4 py-2 text-[12.5px] font-semibold hover:bg-white"><iconify-icon icon="solar:download-minimalistic-linear" width="14" class="mr-1 align-[-2px]"></iconify-icon>엑셀 다운로드</button>
+            <button type="button" class="rounded-xl border border-line bg-linesoft px-4 py-2 text-[12.5px] font-semibold text-faint" disabled>탈퇴 처리</button>
+          </div>
+        </div>
+        <div class="mt-4 overflow-x-auto rounded-2xl border border-line bg-panel">
+          <table class="w-full min-w-[720px] text-left text-[13px]">
+            <thead>
+              <tr class="border-b border-linesoft text-[11.5px] font-semibold uppercase tracking-wide text-faint">
+                <th class="px-4 py-3 w-10"><input type="checkbox" class="h-4 w-4 rounded border-line accent-[#3B4B3F]"></th>
+                <th class="px-2 py-3">가입일</th><th class="px-2 py-3">사용자명</th><th class="px-2 py-3">전화번호</th><th class="px-2 py-3">이메일</th><th class="px-2 py-3">비대면 진료 최근일</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-linesoft">
+              <tr class="hover:bg-linesoft/40">
+                <td class="px-4 py-3.5"><input type="checkbox" class="h-4 w-4 rounded border-line accent-[#3B4B3F]"></td>
+                <td class="tnum px-2 py-3.5">2026-03-18</td><td class="px-2 py-3.5 font-semibold">임○민</td><td class="tnum px-2 py-3.5">010-****-5245</td><td class="px-2 py-3.5">gye****@nate.com</td><td class="px-2 py-3.5 text-faint">-</td>
+              </tr>
+              <tr class="hover:bg-linesoft/40">
+                <td class="px-4 py-3.5"><input type="checkbox" class="h-4 w-4 rounded border-line accent-[#3B4B3F]"></td>
+                <td class="tnum px-2 py-3.5">2026-03-17</td><td class="px-2 py-3.5 font-semibold">박○혜</td><td class="tnum px-2 py-3.5 text-faint">-</td><td class="px-2 py-3.5">fro****@medistream.co.kr</td><td class="px-2 py-3.5 text-faint">-</td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="flex items-center justify-between border-t border-linesoft px-4 py-3 text-[12.5px] font-semibold text-mocha">
+            <label class="flex items-center gap-2">페이지당 <select class="rounded-lg border border-line bg-panel px-2 py-1"><option>25</option><option>50</option></select></label>
+            <span class="flex items-center gap-3">Page 1 of 1
+              <button class="sig flex h-7 w-7 items-center justify-center rounded-lg border border-line" aria-label="이전"><iconify-icon icon="solar:alt-arrow-left-linear" width="14"></iconify-icon></button>
+              <button class="sig flex h-7 w-7 items-center justify-center rounded-lg border border-line" aria-label="다음"><iconify-icon icon="solar:alt-arrow-right-linear" width="14"></iconify-icon></button>
+            </span>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== VIEW: 진료 및 배송 관리 ===== -->
+      <section class="view" id="view-orders">
+        <div class="flex gap-5 border-b border-line text-[13.5px] font-semibold text-mocha">
+          <button class="border-b-2 border-rosewood-deep pb-2.5 text-rosewood-deep">결제 상품 <span class="tnum">0</span></button>
+          <button class="border-b-2 border-transparent pb-2.5 hover:text-espresso">진료 예약 <span class="tnum">0</span></button>
+        </div>
+        <div class="flex flex-col items-center justify-center rounded-2xl border border-line bg-panel py-24 text-center">
+          <span class="flex h-16 w-16 items-center justify-center rounded-full bg-linesoft text-faint">
+            <iconify-icon icon="solar:box-minimalistic-linear" width="28"></iconify-icon>
+          </span>
+          <p class="mt-4 text-[14px] font-semibold text-mocha">표시할 주문이 없습니다.</p>
+          <p class="mt-1 text-[12.5px] text-faint">결제가 발생하면 이곳에서 진료·배송 상태를 관리할 수 있습니다.</p>
+        </div>
+      </section>
+
+
+      <!-- ===== VIEW: 빠른 상담 (홈페이지 상담 신청 수신함) ===== -->
+      <section class="view" id="view-quick">
+        <div class="flex flex-wrap items-center justify-between gap-3">
+          <p class="break-keep text-[13px] text-mocha">홈페이지 하단 상담 신청 폼으로 접수된 요청입니다. 확인 후 연락을 드리고 처리 완료로 표시하세요.</p>
+          <button type="button" class="sig rounded-full border border-line bg-panel px-4 py-2 text-[12.5px] font-semibold hover:bg-white" onclick="renderQuick()">
+            <iconify-icon icon="solar:refresh-linear" width="14" class="mr-1 align-[-2px]"></iconify-icon>새로고침
+          </button>
+        </div>
+        <div class="mt-4 overflow-x-auto rounded-2xl border border-line bg-panel" id="quickWrap"></div>
+      </section>
+
+      <!-- ===== VIEW: 상품 등록·수정 ===== -->
+      <section class="view" id="view-products">
+        <div class="flex flex-wrap items-center justify-between gap-3">
+          <div class="flex gap-2 text-[13px] font-semibold">
+            <button class="ftab on sig rounded-full border border-line bg-panel px-4 py-1.5 text-mocha">전체 <span class="tnum ml-1 rounded-full bg-rosewood/10 px-1.5 text-[11px] text-rosewood-deep">4</span></button>
+            <button class="ftab sig rounded-full border border-line bg-panel px-4 py-1.5 text-mocha">원내 상품 <span class="tnum ml-1 text-[11px] text-faint">4</span></button>
+          </div>
+          <div class="flex gap-2">
+            <button type="button" class="sig rounded-full border border-line bg-panel px-4 py-2 text-[12.5px] font-semibold hover:bg-white"><iconify-icon icon="solar:settings-linear" width="14" class="mr-1 align-[-2px]"></iconify-icon>카테고리 관리</button>
+            <button type="button" class="sig rounded-full bg-rosewood-deep px-4 py-2 text-[12.5px] font-semibold text-ivory hover:bg-pine">+ 상품 추가</button>
+          </div>
+        </div>
+        <div class="mt-4 overflow-x-auto rounded-2xl border border-line bg-panel">
+          <table class="w-full min-w-[860px] text-left text-[13px]">
+            <thead>
+              <tr class="border-b border-linesoft text-[11.5px] font-semibold uppercase tracking-wide text-faint">
+                <th class="px-4 py-3 w-10"><input type="checkbox" class="h-4 w-4 rounded border-line accent-[#3B4B3F]"></th>
+                <th class="px-2 py-3">상품 카테고리</th><th class="px-2 py-3">상품명</th><th class="px-2 py-3">활성화</th><th class="px-2 py-3">품절 여부</th><th class="px-2 py-3 text-right">정상가</th><th class="px-2 py-3 text-right">판매가</th><th class="px-4 py-3 text-right">관리</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-linesoft" id="prodBody"></tbody>
+          </table>
+        </div>
+      </section>
+
+
+      <!-- ===== VIEW: 상품 수정 ===== -->
+      <section class="view" id="view-prodedit">
+        <div class="flex flex-wrap items-center justify-between gap-3">
+          <div class="flex items-center gap-2.5">
+            <button type="button" class="sig flex h-8 w-8 items-center justify-center rounded-full border border-line bg-panel text-mocha hover:text-espresso" onclick="backToProducts()" aria-label="목록으로">
+              <iconify-icon icon="solar:alt-arrow-left-linear" width="15"></iconify-icon>
+            </button>
+            <h2 class="text-[17px] font-bold">상품 수정</h2>
+          </div>
+          <div class="flex gap-2">
+            <button type="button" class="sig rounded-full border border-line bg-panel px-5 py-2 text-[12.5px] font-semibold hover:bg-white" onclick="backToProducts()">취소</button>
+            <button type="button" class="sig rounded-full bg-rosewood-deep px-5 py-2 text-[12.5px] font-semibold text-ivory hover:bg-pine" onclick="saveProdEdit()">저장</button>
+          </div>
+        </div>
+
+        <div class="mt-4 rounded-2xl border border-line bg-panel px-5 py-4 text-[12.5px] leading-relaxed text-mocha">
+          <p class="flex items-start gap-2"><iconify-icon icon="solar:info-circle-linear" width="15" class="mt-0.5 shrink-0 text-rosewood"></iconify-icon>
+            <span class="break-keep"><b class="text-espresso">상품 등록 안내</b><br>결제형은 비급여만 판매 가능해요.<br>온라인 PG는 대표 가맹점이 PG사로 설정되어, 오프라인과 달리 병의원 결제건도 일반 온라인 결제로 분류되어 연말정산시 의료비로 잡히지 않아요. 이로인해 비급여 항목만 취급해야 해요.</span></p>
+        </div>
+
+        <div class="mt-5 grid grid-cols-1 gap-5 lg:grid-cols-2">
+          <!-- 상품 이미지 -->
+          <div class="rounded-2xl border border-line bg-panel p-6">
+            <p class="text-[13.5px] font-bold">상품 이미지 <span class="ml-1 text-[12px] font-medium text-mocha">상품 대표 이미지로 노출 돼요. (최대 10개)</span></p>
+            <p class="mt-4 flex items-start gap-2 rounded-xl border border-linesoft bg-ivory/60 px-4 py-3 text-[12px] font-medium text-mocha">
+              <iconify-icon icon="solar:info-circle-linear" width="14" class="mt-0.5 shrink-0"></iconify-icon>
+              <span class="break-keep">AI생성 콘텐츠 게시 전 광고/심의 준수 사항을 반드시 확인해 주세요. 콘텐츠 책임은 사업장 대표님에게 있어요.</span></p>
+            <label class="mt-5 block text-[12.5px] font-bold">상품명 <span class="text-bad">*</span>
+              <input id="peName" type="text" class="mt-2 h-[46px] w-full rounded-xl border border-line bg-ivory/50 px-4 text-[13.5px] font-medium">
+            </label>
+            <div class="relative mt-5 rounded-2xl border border-dashed border-line bg-ivory/40 p-3">
+              <span class="absolute left-5 top-5 z-10 rounded-lg bg-rosewood-deep px-2.5 py-1 text-[10.5px] font-bold text-ivory">대표 이미지</span>
+              <img id="peImg" src="" alt="상품 대표 이미지" class="mx-auto h-72 w-full max-w-md rounded-xl object-cover" decoding="async">
+            </div>
+            <div class="mt-3 flex items-center gap-2.5">
+              <span class="relative block h-16 w-16 overflow-hidden rounded-xl border-2 border-rosewood-deep">
+                <img id="peThumb" src="" alt="" class="h-full w-full object-cover">
+                <span class="absolute inset-x-0 bottom-0 bg-rosewood-deep py-0.5 text-center text-[9px] font-bold text-ivory">대표</span>
+              </span>
+              <button type="button" class="flex h-16 w-16 flex-col items-center justify-center rounded-xl border border-dashed border-line text-faint">
+                <iconify-icon icon="solar:add-square-linear" width="18"></iconify-icon><span class="tnum mt-0.5 text-[10px] font-semibold">1/10</span>
+              </button>
+            </div>
+            <div class="mt-4 flex items-center justify-between gap-3 rounded-xl border border-dashed border-rosewood/25 bg-rosewood/5 px-4 py-3">
+              <p class="text-[12px] font-medium text-mocha"><b class="text-espresso">업로드 할 썸네일 이미지가 없으신가요?</b><br>AI 생성 이미지를 삽입할 수 있어요.</p>
+              <button type="button" class="sig shrink-0 rounded-xl border border-rosewood/30 bg-panel px-3.5 py-2 text-[12px] font-bold text-rosewood-deep hover:bg-rosewood/5">AI 이미지 생성</button>
+            </div>
+          </div>
+
+          <!-- 기본 상품 정보 -->
+          <div class="rounded-2xl border border-line bg-panel p-6">
+            <p class="text-[13.5px] font-bold">기본 상품 정보</p>
+            <label class="mt-4 block text-[12.5px] font-bold">상품 상세 <span class="text-bad">*</span>
+              <textarea id="peDesc" rows="3" class="mt-2 w-full rounded-xl border border-line bg-ivory/50 p-4 text-[13px] font-normal leading-relaxed"></textarea>
+            </label>
+            <p class="mt-1.5 text-[11.5px] text-faint">상품 상세에 주요 키워드를 텍스트로 작성하면 홈페이지 SEO 검색 노출에 유리해져요.</p>
+
+            <div class="mt-5 flex flex-wrap items-center gap-3">
+              <span class="w-24 text-[12.5px] font-bold">상품 카테고리 <span class="text-bad">*</span></span>
+              <select class="h-[42px] rounded-xl border border-line bg-ivory/50 px-3.5 text-[12.5px] font-medium"><option>원내 상품</option></select>
+              <button type="button" class="sig rounded-xl border border-line px-3.5 py-2.5 text-[12px] font-semibold text-mocha hover:bg-linesoft"><iconify-icon icon="solar:settings-linear" width="13" class="mr-1 align-[-2px]"></iconify-icon>카테고리 관리</button>
+            </div>
+
+            <div class="mt-4 space-y-3.5 text-[12.5px]">
+              <div class="flex items-center gap-3"><span class="w-24 font-bold text-mocha">판매 상태</span>
+                <div class="seg flex overflow-hidden rounded-xl border border-line"><button type="button" class="bg-rosewood-deep px-4 py-2 font-semibold text-ivory">활성화</button><button type="button" class="sig px-4 py-2 font-semibold text-mocha hover:bg-linesoft">비활성화</button></div></div>
+              <div class="flex items-center gap-3"><span class="w-24 font-bold text-mocha">품절 여부</span>
+                <div class="seg flex overflow-hidden rounded-xl border border-line"><button type="button" class="sig px-4 py-2 font-semibold text-mocha hover:bg-linesoft">재고 있음</button><button type="button" class="bg-rosewood-deep px-4 py-2 font-semibold text-ivory">재고 없음</button></div></div>
+              <div class="flex items-center gap-3"><span class="w-24 font-bold text-mocha">과세 유형</span>
+                <div class="seg flex overflow-hidden rounded-xl border border-line"><button type="button" class="bg-rosewood-deep px-4 py-2 font-semibold text-ivory">과세</button><button type="button" class="sig px-4 py-2 font-semibold text-mocha hover:bg-linesoft">면세</button></div></div>
+            </div>
+
+            <div class="mt-6">
+              <div class="flex items-center justify-between">
+                <label for="pePrice" class="text-[12.5px] font-bold">정상가 <span class="text-bad">*</span></label>
+                <label class="flex items-center gap-1.5 text-[12.5px] font-semibold"><input type="checkbox" checked class="h-4 w-4 rounded accent-[#3B4B3F]"> 할인 적용</label>
+              </div>
+              <input id="pePrice" type="text" inputmode="numeric" class="tnum mt-2 h-[46px] w-full rounded-xl border border-line bg-ivory/50 px-4 text-[13.5px] font-medium">
+              <p class="tnum mt-1.5 text-[11.5px] text-faint" id="peSupply1"></p>
+            </div>
+            <div class="mt-4">
+              <label for="peSale" class="text-[12.5px] font-bold">판매가 <span class="text-bad">*</span></label>
+              <input id="peSale" type="text" inputmode="numeric" class="tnum mt-2 h-[46px] w-full rounded-xl border border-line bg-ivory/50 px-4 text-[13.5px] font-medium">
+              <p class="tnum mt-1.5 text-[11.5px] text-faint" id="peSupply2"></p>
+            </div>
+          </div>
+        </div>
+
+        <!-- 상품 콘텐츠 -->
+        <div class="mt-5 rounded-2xl border border-line bg-panel p-6">
+          <p class="text-[13.5px] font-bold">상품 콘텐츠 <span class="ml-1 text-[12px] font-medium text-mocha">헤더 이미지, 상품명, 본문을 한 화면에서 편집해요.</span></p>
+          <div class="mt-4 flex flex-col items-center justify-center rounded-2xl border border-dashed border-line py-14 text-center">
+            <span class="flex h-12 w-12 items-center justify-center rounded-xl border border-line text-mocha"><iconify-icon icon="solar:gallery-add-linear" width="22"></iconify-icon></span>
+            <p class="mt-3 text-[13.5px] font-bold">커버 이미지를 추가하세요</p>
+            <p class="mt-1 text-[12px] text-mocha">이미지를 끌어놓거나 아래 버튼으로 업로드 (최대 50MB)</p>
+            <button type="button" class="sig mt-4 rounded-xl border border-rosewood/30 px-4 py-2 text-[12.5px] font-bold text-rosewood-deep hover:bg-rosewood/5">이미지 업로드</button>
+          </div>
+          <input id="peCTitle" type="text" maxlength="100" placeholder="제목을 입력하세요..." class="mt-6 w-full bg-transparent text-[21px] font-bold placeholder:text-faint focus:outline-none">
+          <p class="tnum text-right text-[11.5px] font-medium text-faint"><span id="peCTitleCount">0</span> / 100</p>
+          <div class="mt-2 flex items-center gap-3 border-y border-linesoft py-2.5 text-mocha">
+            <button type="button" class="sig hover:text-espresso" aria-label="실행 취소"><iconify-icon icon="solar:undo-left-linear" width="16"></iconify-icon></button>
+            <button type="button" class="sig hover:text-espresso" aria-label="다시 실행"><iconify-icon icon="solar:undo-right-linear" width="16"></iconify-icon></button>
+            <span class="h-4 w-px bg-line"></span>
+            <button type="button" class="sig hover:text-espresso" aria-label="블록 추가"><iconify-icon icon="solar:add-square-linear" width="16"></iconify-icon></button>
+          </div>
+          <div contenteditable="true" class="min-h-[160px] py-10 text-center text-[13.5px] text-faint focus:outline-none focus:text-espresso focus:text-left" data-placeholder="상품 설명을 입력하세요..">상품 설명을 입력하세요..</div>
+        </div>
+
+        <!-- 주요 정보 입력 -->
+        <div class="mt-5 rounded-2xl border border-line bg-panel p-6">
+          <p class="flex flex-wrap items-center gap-2 text-[13.5px] font-bold">주요 정보 입력
+            <span class="flex items-center gap-1 text-[12px] font-medium text-mocha"><iconify-icon icon="solar:question-circle-linear" width="14"></iconify-icon> 전자상거래법 및 의료법 광고 기준을 준수하기 위한 필수 정보예요. 허위/과장 없는 정확한 정보 고지 의무는 원장님께 있어요.</span>
+          </p>
+          <div class="mt-5 space-y-4 text-[12.5px] font-bold">
+            <label class="block">주요 성분
+              <input type="text" maxlength="100" placeholder="어떤 성분으로 구성되어 있는지에 대한 정보를 최대 100자까지 입력해 주세요." class="mt-2 h-[46px] w-full rounded-xl border border-line bg-ivory/50 px-4 text-[13px] font-normal placeholder:text-faint"></label>
+            <label class="block">상품 용량
+              <input type="text" maxlength="100" placeholder="해당 의약품의 복용 용량을 최대 100자까지 입력해 주세요." class="mt-2 h-[46px] w-full rounded-xl border border-line bg-ivory/50 px-4 text-[13px] font-normal placeholder:text-faint"></label>
+            <label class="block">상품 효과
+              <input type="text" maxlength="100" placeholder="해당 의약품이 어떤 증상이나 질환에 효과가 있는지에 대한 공식적인 설명을 최대 100자까지 입력해 주세요." class="mt-2 h-[46px] w-full rounded-xl border border-line bg-ivory/50 px-4 text-[13px] font-normal placeholder:text-faint"></label>
+            <label class="block">사용 기한
+              <input type="text" maxlength="100" placeholder="제품의 유효 기간과 올바른 보관 방법을 최대 100자까지 입력해 주세요." class="mt-2 h-[46px] w-full rounded-xl border border-line bg-ivory/50 px-4 text-[13px] font-normal placeholder:text-faint"></label>
+            <label class="block">기타 사항
+              <input type="text" maxlength="100" placeholder="배송일정 안내, 배송비 안내 등 기타 결제 전 환자가 인지해야 할 사항을 최대 100자까지 입력해 주세요." class="mt-2 h-[46px] w-full rounded-xl border border-line bg-ivory/50 px-4 text-[13px] font-normal placeholder:text-faint"></label>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== VIEW: 수(壽) 멤버스 상품 연동 ===== -->
+      <section class="view" id="view-su">
+        <div class="rounded-2xl border border-champagne/40 bg-champagne/10 px-5 py-4 text-[12.5px] leading-relaxed text-rosewood-deep">
+          <p class="flex items-start gap-2"><iconify-icon icon="solar:info-circle-linear" width="16" class="mt-0.5 shrink-0"></iconify-icon>
+            <span class="break-keep">수 멤버스 상품 정보 및 판매 정책은 수 멤버스 운영진이 관리하며, 자동으로 동기화됩니다. 연동을 해제하면 홈페이지에 해당 상품이 노출되지 않으며, 언제든지 다시 연동할 수 있습니다.</span></p>
+        </div>
+        <div class="mt-4 flex flex-wrap items-center justify-between gap-3">
+          <span class="tnum text-[13px] font-semibold text-mocha">총 <b class="text-espresso">20</b>건</span>
+          <div class="flex items-center gap-2">
+            <label class="relative block">
+              <iconify-icon icon="solar:magnifer-linear" width="15" class="absolute left-3 top-1/2 -translate-y-1/2 text-faint"></iconify-icon>
+              <input type="search" placeholder="진료/상품명 검색" class="w-48 rounded-xl border border-line bg-panel py-2 pl-9 pr-3 text-[12.5px] placeholder:text-faint">
+            </label>
+            <button type="button" class="sig rounded-xl border border-bad/30 bg-badbg px-4 py-2 text-[12.5px] font-semibold text-bad hover:brightness-95">수 멤버스 상품 연동 해제</button>
+          </div>
+        </div>
+        <div class="mt-4 overflow-x-auto rounded-2xl border border-line bg-panel">
+          <table class="w-full min-w-[860px] text-left text-[13px]">
+            <thead>
+              <tr class="border-b border-linesoft text-[11.5px] font-semibold uppercase tracking-wide text-faint">
+                <th class="px-4 py-3">진료 유형</th><th class="px-2 py-3">진료/상품명</th><th class="px-2 py-3 text-right">정상가</th><th class="px-2 py-3 text-right">판매가</th><th class="px-2 py-3">활성화 여부</th><th class="px-4 py-3 text-right">관리</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-linesoft" id="suBody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ===== VIEW: 배송·환불 안내 템플릿 ===== -->
+      <section class="view" id="view-shipping">
+        <div class="rounded-2xl border border-warn/25 bg-warnbg px-5 py-4 text-[12.5px] leading-relaxed text-warn">
+          <p class="font-bold">작성 가이드</p>
+          <p class="break-keep mt-1.5">전자상거래법 및 소비자 보호를 위해 반드시 홈페이지 내 고지해야 할 법적 고지 의무사항입니다. 배송, 주문 취소, 교환/반품 정보를 명확히 고지해야 하며, 책임은 사업장 대표에게 있습니다. 작성 내용은 모든 상품 상세 페이지에 공통 적용됩니다.</p>
+        </div>
+
+        <form class="mt-5 space-y-5" onsubmit="return false;">
+          <div class="rounded-2xl border border-line bg-panel p-6">
+            <label class="block text-[13px] font-bold">배송 안내 <span class="text-bad">*</span>
+              <textarea rows="5" class="mt-2.5 w-full rounded-xl border border-line bg-ivory/50 p-4 text-[13px] font-normal leading-relaxed">한의원과 진료가 완료되면 배송이 시작됩니다.
+한의원에 직접 방문하여 한약을 수령할 수 있습니다. 주문 단계에서 선택하세요.
+결제완료 후 영업일기준 1~3일 정도 배송 소요 됩니다. (단, 도서산간, 물량 급증, 천재지변 등 택배사 사정 및 생산 이슈 등에 의하여 배송 지연이 발생할 수 있습니다.)
+택배사는 진료 받는 한의원에 따라 다를 수 있습니다.</textarea>
+            </label>
+          </div>
+          <div class="rounded-2xl border border-line bg-panel p-6">
+            <label class="block text-[13px] font-bold">주문 취소 안내 <span class="text-bad">*</span>
+              <textarea rows="3" class="mt-2.5 w-full rounded-xl border border-line bg-ivory/50 p-4 text-[13px] font-normal leading-relaxed">'진료대기' 상태 시 [주문 내역] 페이지에서 가능하며, 진료가 시작된 이후에는 주문취소는 불가합니다.
+카드 결제 승인 취소 반영은 카드사 정책에 따르며 자세한 사항은 카드사에 문의해주세요.</textarea>
+            </label>
+          </div>
+          <div class="rounded-2xl border border-line bg-panel p-6">
+            <label class="block text-[13px] font-bold">교환/반품 안내 <span class="text-bad">*</span>
+              <textarea rows="3" class="mt-2.5 w-full rounded-xl border border-line bg-ivory/50 p-4 text-[13px] font-normal leading-relaxed">교환/반품의 신청은 주문 오류 또는 단순 변심일 경우 상품 배송 완료일로부터 7일 이내 가능합니다.
+상품이 표시내용과 다르거나 불량일 경우 상품 수령일로부터 3개월, 이상 확인을 한 날로부터 30일까지 교환/반품 신청 가능합니다.</textarea>
+            </label>
+          </div>
+          <div class="flex justify-end gap-2">
+            <button type="button" class="sig rounded-full border border-line bg-panel px-6 py-2.5 text-[13px] font-semibold hover:bg-white">취소</button>
+            <button type="submit" class="sig rounded-full bg-rosewood-deep px-6 py-2.5 text-[13px] font-semibold text-ivory hover:bg-pine">저장</button>
+          </div>
+        </form>
+      </section>
+
+      <!-- ===== VIEW: 방문 통계 ===== -->
+      <section class="view" id="view-stats">
+        <div class="flex flex-wrap items-center justify-between gap-3">
+          <div class="flex gap-5 border-b border-line text-[13.5px] font-semibold text-mocha">
+            <button class="border-b-2 border-rosewood-deep pb-2.5 text-rosewood-deep">방문 통계</button>
+            <button class="border-b-2 border-transparent pb-2.5 hover:text-espresso">게시글</button>
+            <button class="border-b-2 border-transparent pb-2.5 hover:text-espresso">팝업</button>
+          </div>
+          <div class="flex items-center gap-2 text-[12.5px] font-semibold">
+            <div class="flex overflow-hidden rounded-xl border border-line bg-panel">
+              <button class="bg-rosewood-deep px-3.5 py-2 text-ivory">30일</button>
+              <button class="sig px-3.5 py-2 text-mocha hover:bg-linesoft">60일</button>
+              <button class="sig px-3.5 py-2 text-mocha hover:bg-linesoft">90일</button>
+            </div>
+            <span class="tnum rounded-xl border border-line bg-panel px-3.5 py-2 text-mocha">2026.06.28 ~ 2026.07.28</span>
+            <button type="button" class="sig rounded-xl border border-line bg-panel px-3.5 py-2 hover:bg-white"><iconify-icon icon="solar:download-minimalistic-linear" width="14" class="mr-1 align-[-2px]"></iconify-icon>엑셀</button>
+          </div>
+        </div>
+
+        <div class="mt-5 rounded-2xl border border-line bg-panel p-6">
+          <div class="flex items-center justify-between text-[12px] font-semibold text-mocha">
+            <span>일별 방문 추이</span>
+            <span class="flex items-center gap-4"><span class="flex items-center gap-1.5"><i class="h-2.5 w-2.5 rounded-sm bg-rosewood"></i>방문수</span><span class="flex items-center gap-1.5"><i class="h-0.5 w-4 rounded bg-champagne"></i>순 방문자</span></span>
+          </div>
+          <div class="mt-6 flex h-56 items-end gap-2 sm:gap-3" id="chart"></div>
+          <div class="mt-2 grid text-center text-[10.5px] font-medium text-faint" id="chartLabels" style="grid-auto-flow:column; grid-auto-columns:1fr;"></div>
+        </div>
+
+        <div class="mt-4 overflow-x-auto rounded-2xl border border-line bg-panel">
+          <table class="w-full min-w-[760px] text-center text-[12.5px]" id="statTable">
+            <thead><tr class="border-b border-linesoft text-[11.5px] font-semibold uppercase tracking-wide text-faint"><th class="px-3 py-3 text-left">구분</th></tr></thead>
+            <tbody class="divide-y divide-linesoft"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ===== VIEW: 직원 계정 관리 ===== -->
+      <section class="view" id="view-staff">
+        <div class="grid grid-cols-1 gap-5 lg:grid-cols-[300px_1fr]">
+          <div class="rounded-2xl border border-line bg-panel p-5">
+            <div class="flex items-center justify-between">
+              <p class="text-[14px] font-bold">직원 계정 목록</p>
+              <button type="button" class="sig rounded-full bg-rosewood-deep px-3.5 py-1.5 text-[12px] font-semibold text-ivory hover:bg-pine">+ 계정 추가</button>
+            </div>
+            <p class="mt-4 flex items-center gap-1.5 text-[11.5px] font-semibold uppercase tracking-wide text-faint"><iconify-icon icon="solar:users-group-rounded-linear" width="14"></iconify-icon> 전체 목록</p>
+            <button class="mt-2 w-full rounded-xl border border-rosewood/30 bg-rosewood/8 px-4 py-3 text-left">
+              <p class="text-[13px] font-bold text-rosewood-deep">nicepay-yeonojae</p>
+              <p class="mt-0.5 text-[11.5px] text-mocha">결제 담당 계정</p>
+            </button>
+          </div>
+          <div class="rounded-2xl border border-line bg-panel p-6">
+            <div class="flex gap-5 border-b border-line text-[13.5px] font-semibold text-mocha">
+              <button class="border-b-2 border-rosewood-deep pb-2.5 text-rosewood-deep">계정 기본 정보</button>
+              <button class="border-b-2 border-transparent pb-2.5 hover:text-espresso">계정 권한 설정</button>
+            </div>
+            <div class="mt-5 flex items-center justify-between">
+              <p class="text-[13.5px] font-bold">계정 기본 정보 <span class="ml-1 font-medium text-mocha">nicepay-yeonojae 직원 계정의 기본 정보입니다.</span></p>
+              <button type="button" class="sig rounded-full border border-bad/30 bg-badbg px-4 py-2 text-[12.5px] font-semibold text-bad hover:brightness-95">계정 삭제</button>
+            </div>
+            <dl class="mt-4 grid grid-cols-1 overflow-hidden rounded-xl border border-line text-[13px] sm:grid-cols-2">
+              <div class="flex border-b border-linesoft"><dt class="w-28 shrink-0 bg-linesoft/60 px-4 py-3.5 font-semibold text-mocha">이름</dt><dd class="px-4 py-3.5 font-medium">nicepay-yeonojae</dd></div>
+              <div class="flex border-b border-linesoft"><dt class="w-28 shrink-0 bg-linesoft/60 px-4 py-3.5 font-semibold text-mocha">로그인 아이디</dt><dd class="px-4 py-3.5 font-medium">nicepay-yeonojae</dd></div>
+              <div class="flex"><dt class="w-28 shrink-0 bg-linesoft/60 px-4 py-3.5 font-semibold text-mocha">계정 생성일</dt><dd class="tnum px-4 py-3.5 font-medium">2026년 3월 16일</dd></div>
+              <div class="flex"><dt class="w-28 shrink-0 bg-linesoft/60 px-4 py-3.5 font-semibold text-mocha">비밀번호</dt><dd class="px-4 py-3"><button type="button" class="sig rounded-full border border-rosewood/30 px-3.5 py-1.5 text-[12px] font-semibold text-rosewood-deep hover:bg-rosewood/5">비밀번호 재설정</button></dd></div>
+            </dl>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+</div>
+
+<!-- ===== 게시판 이동 모달 ===== -->
+<dialog id="moveModal" class="w-[92vw] max-w-md rounded-3xl border border-line bg-panel p-0 shadow-2xl">
+  <div class="p-7">
+    <div class="flex items-start justify-between">
+      <span class="flex h-11 w-11 items-center justify-center rounded-2xl bg-rosewood/10 text-rosewood-deep"><iconify-icon icon="solar:document-add-linear" width="20"></iconify-icon></span>
+      <button type="button" class="sig text-faint hover:text-espresso" onclick="moveModal.close()" aria-label="닫기"><iconify-icon icon="solar:close-circle-linear" width="22"></iconify-icon></button>
+    </div>
+    <p class="mt-4 text-[15.5px] font-bold">이동할 게시판을 선택해 주세요</p>
+    <p class="mt-1 text-[12.5px] text-mocha" id="movePostName"></p>
+    <div class="mt-4 space-y-1 rounded-2xl border border-line p-2 text-[13.5px] font-medium" id="moveList"></div>
+    <div class="mt-5 flex justify-end gap-2">
+      <button type="button" class="sig rounded-full border border-line px-5 py-2 text-[13px] font-semibold" onclick="moveModal.close()">취소</button>
+      <button type="button" class="sig rounded-full bg-rosewood-deep px-5 py-2 text-[13px] font-semibold text-ivory hover:bg-pine" id="moveConfirm">이동</button>
+    </div>
+  </div>
+</dialog>
+
+<!-- ===== 맞춤 콘텐츠 검토·게시 에디터 ===== -->
+<dialog id="editorModal" class="h-[92dvh] w-[96vw] max-w-5xl rounded-3xl border border-line bg-panel p-0 shadow-2xl">
+  <div class="flex h-full flex-col">
+    <div class="flex items-center justify-between gap-4 border-b border-linesoft px-6 py-4">
+      <p class="flex items-center gap-3 text-[14px] font-bold">맞춤 콘텐츠
+        <span class="flex items-center gap-1.5 text-[12px] font-medium text-mocha"><iconify-icon icon="solar:danger-circle-linear" width="14"></iconify-icon> 게시 전 반드시 내용을 검토해 주세요. 게시글에 대한 책임은 게시자에게 있어요.</span>
+      </p>
+      <button type="button" class="sig text-faint hover:text-espresso" onclick="editorModal.close()" aria-label="닫기"><iconify-icon icon="solar:close-circle-linear" width="24"></iconify-icon></button>
+    </div>
+
+    <div class="relative flex-1 overflow-y-auto px-8 py-8 sm:px-14">
+      <div class="mx-auto max-w-2xl">
+        <textarea id="edTitle" rows="2" class="w-full resize-none bg-transparent text-[26px] font-extrabold leading-snug tracking-snugger focus:outline-none"></textarea>
+        <p class="tnum text-right text-[12px] font-medium text-faint"><span id="edTitleCount">0</span> / 100</p>
+        <input id="edSub" type="text" class="mt-1 w-full bg-transparent text-[14.5px] text-mocha focus:outline-none" placeholder="부제목을 입력하세요">
+        <hr class="mt-6 border-espresso/60">
+        <div id="edBody" contenteditable="true" class="prose mt-8 min-h-[300px] max-w-none text-[14.5px] leading-relaxed focus:outline-none"></div>
+      </div>
+
+      <div class="sticky bottom-4 float-right mr-0 hidden w-[130px] grid-cols-2 gap-y-4 rounded-2xl border border-line bg-panel/95 px-3 py-4 text-center shadow-lg backdrop-blur-sm lg:grid">
+        <button type="button" class="sig flex flex-col items-center gap-1 text-[10.5px] font-semibold text-mocha hover:text-rosewood-deep"><iconify-icon icon="solar:gallery-linear" width="18"></iconify-icon>이미지</button>
+        <button type="button" class="sig flex flex-col items-center gap-1 text-[10.5px] font-semibold text-mocha hover:text-rosewood-deep"><iconify-icon icon="solar:widget-linear" width="18"></iconify-icon>갤러리</button>
+        <button type="button" class="sig flex flex-col items-center gap-1 text-[10.5px] font-semibold text-mocha hover:text-rosewood-deep"><iconify-icon icon="solar:videocamera-record-linear" width="18"></iconify-icon>영상</button>
+        <button type="button" class="sig flex flex-col items-center gap-1 text-[10.5px] font-semibold text-mocha hover:text-rosewood-deep"><iconify-icon icon="solar:document-linear" width="18"></iconify-icon>문서</button>
+        <button type="button" class="sig flex flex-col items-center gap-1 text-[10.5px] font-semibold text-mocha hover:text-rosewood-deep"><iconify-icon icon="solar:play-circle-linear" width="18"></iconify-icon>유튜브</button>
+        <button type="button" class="sig flex flex-col items-center gap-1 text-[10.5px] font-semibold text-mocha hover:text-rosewood-deep"><iconify-icon icon="solar:link-linear" width="18"></iconify-icon>링크</button>
+        <button type="button" class="sig flex flex-col items-center gap-1 text-[10.5px] font-semibold text-mocha hover:text-rosewood-deep"><iconify-icon icon="solar:map-point-linear" width="18"></iconify-icon>지도</button>
+        <button type="button" class="sig flex flex-col items-center gap-1 text-[10.5px] font-semibold text-mocha hover:text-rosewood-deep"><iconify-icon icon="solar:widget-6-linear" width="18"></iconify-icon>표</button>
+        <button type="button" class="sig flex flex-col items-center gap-1 text-[10.5px] font-semibold text-mocha hover:text-rosewood-deep"><iconify-icon icon="solar:bag-4-linear" width="18"></iconify-icon>상품</button>
+        <button type="button" class="sig flex flex-col items-center gap-1 text-[10.5px] font-semibold text-mocha hover:text-rosewood-deep"><iconify-icon icon="solar:phone-linear" width="18"></iconify-icon>전화번호</button>
+        <button type="button" class="sig flex flex-col items-center gap-1 text-[10.5px] font-semibold text-mocha hover:text-rosewood-deep"><iconify-icon icon="solar:minus-square-linear" width="18"></iconify-icon>구분선</button>
+        <button type="button" class="sig flex flex-col items-center gap-1 text-[10.5px] font-semibold text-mocha hover:text-rosewood-deep"><iconify-icon icon="solar:calendar-mark-linear" width="18"></iconify-icon>네이버 예약</button>
+      </div>
+    </div>
+
+    <div class="flex flex-wrap items-center justify-between gap-3 border-t border-linesoft px-6 py-4">
+      <div class="flex flex-wrap gap-2 text-[12.5px] font-semibold text-mocha">
+        <button type="button" class="sig flex items-center gap-1.5 rounded-full border border-line px-4 py-2 hover:bg-linesoft"><iconify-icon icon="solar:book-linear" width="14"></iconify-icon> 블로그 가져오기</button>
+        <button type="button" class="sig flex items-center gap-1.5 rounded-full border border-line px-4 py-2 hover:bg-linesoft"><iconify-icon icon="solar:diskette-linear" width="14"></iconify-icon> 임시저장 내역</button>
+        <button type="button" class="sig flex items-center gap-1.5 rounded-full border border-line px-4 py-2 hover:bg-linesoft"><iconify-icon icon="solar:eye-linear" width="14"></iconify-icon> 미리보기</button>
+      </div>
+      <div class="flex flex-wrap items-center gap-2 text-[12.5px] font-semibold">
+        <label class="flex items-center gap-2 text-mocha">추천 게시판
+          <select id="edBoard" class="rounded-xl border border-line bg-panel px-3 py-2 text-espresso"><option>한의원 소개</option><option>집중 진료</option><option>다이어트 치료</option><option>한방 치료</option><option>공지사항</option></select>
+        </label>
+        <button type="button" class="sig rounded-full border border-line px-5 py-2.5 hover:bg-linesoft">임시 저장</button>
+        <button type="button" class="sig rounded-full bg-rosewood-deep px-5 py-2.5 text-ivory hover:bg-pine" onclick="publishCustom()">게시글 게시</button>
+      </div>
+    </div>
+  </div>
+</dialog>
+
+
+<script src="yeonohjae_store.js"></script>
+<script>
+  // ---------- data ----------
+  const DB = window.YO_STORE ? YO_STORE.get() : null;
+  const posts = DB ? DB.posts : [];
+  const boards = ['진행 중인 이벤트','진료 후기','다이어트 치료','집중 진료','한방 치료','한의원 소개','공지사항'];
+  const products = DB ? DB.products : [];
+  const suItems = [
+    ['원방 우황청심원 수壽 - 1환','75,000','75,000'], ['원방공진단 수壽 - 30환','1,950,000','1,950,000'],
+    ['녹용한약 수壽 - 10포','110,000','110,000'], ['총명공진단 수壽 - 30포 단품','220,000','220,000'],
+    ['우황청심원 수壽 - 1환','35,000','35,000'], ['녹용경옥고 수壽 - 30포','195,000','195,000'],
+    ['원방공진단 수壽 - 10환','680,000','680,000'], ['녹용한약 수壽 - 90포','860,000','860,000'],
+    ['[20%] 생맥산 수壽 - 1박스 (30포)','150,000','120,000'], ['녹용공진단 수壽 - 10환','200,000','200,000'],
+    ['경옥고 수壽 - 30포','175,000','175,000'], ['녹용공진단 수壽 - 30환','570,000','570,000'],
+  ];
+  const stats = [
+    ['06-29',1,1],['07-01',3,2],['07-02',1,1],['07-06',2,2],['07-09',3,2],
+    ['07-13',1,1],['07-19',1,1],['07-20',7,2],['07-23',1,1],['07-26',3,1],['07-27',3,2],
+  ];
+
+  // ---------- render: posts ----------
+  const postBody = document.getElementById('postBody');
+  let activeCat = 'all', keyword = '';
+  function badge() { return '<span class="inline-flex items-center gap-1 rounded-full bg-goodbg px-2.5 py-1 text-[11px] font-bold text-good"><iconify-icon icon="solar:check-circle-bold" width="12"></iconify-icon>게시 중</span>'; }
+  function renderPosts() {
+    const rows = posts.filter(p => (activeCat==='all'||p.cat===activeCat) && p.t.includes(keyword));
+    document.getElementById('postCount').textContent = rows.length;
+    postBody.innerHTML = rows.map((p,i) => `
+      <tr class="hover:bg-linesoft/40">
+        <td class="px-4 py-3"><input type="checkbox" class="h-4 w-4 rounded border-line accent-[#3B4B3F]"></td>
+        <td class="px-2 py-3">
+          <span class="flex items-center gap-3">
+            <img src="https://picsum.photos/seed/adm-${p.seed}/72/72" alt="" class="h-9 w-9 shrink-0 rounded-lg object-cover" loading="lazy" decoding="async">
+            <span class="break-keep max-w-[340px] font-semibold leading-snug">${p.t}</span>
+          </span>
+        </td>
+        <td class="tnum whitespace-nowrap px-2 py-3 text-mocha">${p.d}</td>
+        <td class="tnum px-2 py-3 text-mocha">${p.v}회</td>
+        <td class="px-2 py-3">${badge()}</td>
+        <td class="whitespace-nowrap px-2 py-3 font-medium text-mocha">${p.loc}</td>
+        <td class="whitespace-nowrap px-4 py-3 text-right">
+          <button type="button" class="sig rounded-lg border border-line px-3 py-1.5 text-[12px] font-semibold hover:bg-linesoft" onclick="openMove(${posts.indexOf(p)})">이동</button>
+          <button type="button" class="sig ml-1 text-faint hover:text-rosewood-deep" aria-label="고정"><iconify-icon icon="solar:pin-linear" width="16"></iconify-icon></button>
+          <button type="button" class="sig ml-1 text-faint hover:text-rosewood-deep" aria-label="수정"><iconify-icon icon="solar:pen-linear" width="16"></iconify-icon></button>
+          <button type="button" class="sig ml-1 text-faint hover:text-bad" aria-label="삭제"><iconify-icon icon="solar:trash-bin-trash-linear" width="16"></iconify-icon></button>
+          <button type="button" class="sig ml-1 text-faint hover:text-rosewood-deep" aria-label="새 창에서 보기"><iconify-icon icon="solar:square-top-up-linear" width="16"></iconify-icon></button>
+        </td>
+      </tr>`).join('');
+  }
+  renderPosts();
+  document.getElementById('postTabs').addEventListener('click', (e) => {
+    const b = e.target.closest('.ftab'); if (!b) return;
+    document.querySelectorAll('#postTabs .ftab').forEach(x => x.classList.remove('on'));
+    b.classList.add('on'); activeCat = b.dataset.cat; renderPosts();
+  });
+  document.getElementById('postSearch').addEventListener('input', (e) => { keyword = e.target.value.trim(); renderPosts(); });
+
+  // ---------- move modal ----------
+  const moveModal = document.getElementById('moveModal');
+  let moveIdx = null;
+  window.openMove = (i) => {
+    moveIdx = i;
+    document.getElementById('movePostName').textContent = '「' + posts[i].t + '」';
+    document.getElementById('moveList').innerHTML = boards.map(b => `
+      <label class="sig flex cursor-pointer items-center justify-between rounded-xl px-3.5 py-2.5 hover:bg-linesoft/60 ${b===posts[i].loc?'bg-rosewood/8 text-rosewood-deep':''}">
+        ${b}<input type="radio" name="board" value="${b}" ${b===posts[i].loc?'checked':''} class="h-4 w-4 accent-[#3B4B3F]">
+      </label>`).join('');
+    moveModal.showModal();
+  };
+  document.getElementById('moveConfirm').addEventListener('click', () => {
+    const sel = document.querySelector('#moveList input:checked');
+    if (sel && moveIdx !== null) {
+      posts[moveIdx].loc = sel.value;
+      const catMap = {'진행 중인 이벤트':'event','진료 후기':'review','다이어트 치료':'diet','집중 진료':'focus','한방 치료':'treat','한의원 소개':'about','공지사항':'notice'};
+      posts[moveIdx].cat = catMap[sel.value];
+      if (window.YO_STORE) YO_STORE.update(db => { db.posts = posts; });
+      renderPosts();
+    }
+    moveModal.close();
+  });
+
+  // ---------- render: products ----------
+  function renderProducts() {
+  document.getElementById('prodBody').innerHTML = products.map(p => `
+    <tr class="hover:bg-linesoft/40">
+      <td class="px-4 py-3"><input type="checkbox" class="h-4 w-4 rounded border-line accent-[#3B4B3F]"></td>
+      <td class="px-2 py-3"><select class="rounded-lg border border-line bg-panel px-2.5 py-1.5 text-[12.5px] font-medium"><option>원내 상품</option></select></td>
+      <td class="px-2 py-3"><span class="flex items-center gap-3"><img src="https://picsum.photos/seed/adm-${p.seed}/72/72" alt="" class="h-9 w-9 rounded-lg object-cover" loading="lazy" decoding="async"><b>${p.n}</b></span></td>
+      <td class="px-2 py-3"><span class="inline-flex items-center gap-1 rounded-full bg-goodbg px-2.5 py-1 text-[11px] font-bold text-good">활성화</span></td>
+      <td class="px-2 py-3"><span class="inline-flex items-center gap-1 rounded-full bg-badbg px-2.5 py-1 text-[11px] font-bold text-bad">재고 없음</span></td>
+      <td class="tnum px-2 py-3 text-right">${(p.price||999999).toLocaleString('ko-KR')}원</td>
+      <td class="tnum px-2 py-3 text-right font-semibold">${(p.sale||999999).toLocaleString('ko-KR')}원</td>
+      <td class="whitespace-nowrap px-4 py-3 text-right">
+        <button class="sig text-faint hover:text-rosewood-deep" aria-label="수정" onclick="openProdEdit(${products.indexOf(p)})"><iconify-icon icon="solar:pen-linear" width="16"></iconify-icon></button>
+        <button class="sig ml-1 text-faint hover:text-bad" aria-label="삭제"><iconify-icon icon="solar:trash-bin-trash-linear" width="16"></iconify-icon></button>
+        <button class="sig ml-2 rounded-lg border border-line px-3 py-1.5 text-[12px] font-semibold hover:bg-linesoft">복제</button>
+      </td>
+    </tr>`).join('');
+  }
+  renderProducts();
+
+  // ---------- render: su members ----------
+  document.getElementById('suBody').innerHTML = suItems.map((s,i) => `
+    <tr class="hover:bg-linesoft/40">
+      <td class="px-4 py-3"><span class="rounded-full bg-rosewood/10 px-2.5 py-1 text-[11px] font-bold text-rosewood-deep">결제형</span></td>
+      <td class="px-2 py-3"><span class="flex items-center gap-3"><img src="https://picsum.photos/seed/adm-su${i}/72/72" alt="" class="h-9 w-9 rounded-lg object-cover" loading="lazy" decoding="async"><b>${s[0]}</b></span></td>
+      <td class="tnum px-2 py-3 text-right">${s[1]}원</td>
+      <td class="tnum px-2 py-3 text-right font-semibold ${s[1]!==s[2]?'text-rosewood-deep':''}">${s[2]}원</td>
+      <td class="px-2 py-3"><button type="button" class="toggle on" role="switch" aria-checked="true" aria-label="활성화" onclick="this.classList.toggle('on'); this.setAttribute('aria-checked', this.classList.contains('on'));"></button></td>
+      <td class="whitespace-nowrap px-4 py-3 text-right">
+        <button class="sig rounded-lg border border-line px-3 py-1.5 text-[12px] font-semibold hover:bg-linesoft">상세보기</button>
+        <button class="sig ml-1 rounded-lg border border-line px-3 py-1.5 text-[12px] font-semibold hover:bg-linesoft">홈페이지에서 보기</button>
+      </td>
+    </tr>`).join('');
+
+  // ---------- render: stats ----------
+  const maxV = Math.max(...stats.map(s => s[1]));
+  document.getElementById('chart').innerHTML = stats.map(s => `
+    <div class="group relative flex h-full flex-1 flex-col items-center justify-end">
+      <span class="pointer-events-none absolute -top-1 hidden rounded-lg bg-espresso px-2 py-1 text-[10.5px] font-semibold text-ivory group-hover:block">${s[1]}회 · ${s[2]}명</span>
+      <div class="bar w-full max-w-[34px] rounded-t-lg bg-rosewood/85 group-hover:bg-rosewood-deep" style="height:${Math.round(s[1]/maxV*100)}%"></div>
+    </div>`).join('');
+  document.getElementById('chartLabels').innerHTML = stats.map(s => `<span>${s[0]}</span>`).join('');
+  const st = document.querySelector('#statTable');
+  st.querySelector('thead tr').innerHTML = '<th class="px-3 py-3 text-left">구분</th>' + stats.map(s => `<th class="tnum px-3 py-3 font-semibold">26-${s[0]}</th>`).join('');
+  st.querySelector('tbody').innerHTML =
+    '<tr><td class="px-3 py-3 text-left font-semibold text-mocha">방문수</td>' + stats.map(s => `<td class="tnum px-3 py-3">${s[1]}회</td>`).join('') + '</tr>' +
+    '<tr><td class="px-3 py-3 text-left font-semibold text-mocha">순 방문자</td>' + stats.map(s => `<td class="tnum px-3 py-3">${s[2]}명</td>`).join('') + '</tr>';
+
+
+  // ---------- dashboard date/time ----------
+  const days = ['일요일','월요일','화요일','수요일','목요일','금요일','토요일'];
+  const now = new Date();
+  document.getElementById('dashDate').textContent = `${now.getMonth()+1}월 ${now.getDate()}일 ${days[now.getDay()]} 운영 현황`;
+  window.setDashTime = () => {
+    const t = new Date();
+    const ap = t.getHours() < 12 ? '오전' : '오후';
+    const h = t.getHours() % 12 || 12;
+    document.getElementById('dashTime').textContent = `${ap} ${h}시 ${t.getMinutes()}분`;
+  };
+  setDashTime();
+
+  // ---------- 상단 메뉴 관리 (홈페이지 메뉴와 동일한 순서) ----------
+  const menus = [
+    { name:'홈', attr:'기본', url:'/', count:null, fixed:true, active:null },
+    { name:'진행 중인 이벤트', attr:'이벤트', url:'/board/events', count:1, active:true },
+    { name:'원내 상품', attr:'기본', url:'/telemedicine/product', count:null, active:null },
+    { name:'진료 예약', attr:'기본', url:'/telemedicine/reservation', count:null, active:null },
+    { name:'진료 후기', attr:'후기', url:'/board/medical-record', count:0, active:true },
+    { name:'다이어트 치료', attr:'일반', url:'/board/diet_healing', count:2, active:true },
+    { name:'집중 진료', attr:'일반', url:'/board/focused_clinic', count:3, active:true },
+    { name:'한방 치료', attr:'일반', url:'/board/herbal_medicine', count:8, active:true },
+    { name:'한의원 소개', attr:'일반', url:'/board/introduction', count:2, active:true },
+    { name:'공지사항', attr:'일반', url:'/board/notice', count:3, active:true },
+  ];
+  document.getElementById('menuBody').innerHTML = menus.map((m,i) => `
+    <tr class="hover:bg-linesoft/40">
+      <td class="px-3 py-3.5 text-faint">${m.fixed ? '' : '<iconify-icon icon="solar:sort-linear" width="15" class="cursor-grab"></iconify-icon>'}</td>
+      <td class="px-2 py-3.5"><input type="checkbox" class="h-4 w-4 rounded border-line accent-[#3B4B3F]" ${m.fixed?'disabled':''}></td>
+      <td class="tnum px-2 py-3.5 font-semibold">${i+1}${m.fixed ? ' <span class="ml-1 rounded-md bg-linesoft px-1.5 py-0.5 text-[10.5px] font-bold text-mocha">고정</span>' : ''}</td>
+      <td class="px-2 py-3.5 font-bold">${m.name}</td>
+      <td class="px-2 py-3.5"><span class="rounded-full border border-line px-2.5 py-1 text-[11px] font-semibold text-mocha">${m.attr}</span></td>
+      <td class="tnum px-2 py-3.5 text-mocha">${m.url}</td>
+      <td class="tnum px-2 py-3.5 font-semibold">${m.count === null ? '<span class="text-faint">-</span>' : m.count + '개 <iconify-icon icon="solar:alt-arrow-right-linear" width="12" class="text-faint align-[-1px]"></iconify-icon>'}</td>
+      <td class="px-2 py-3.5">${m.active === null ? '<span class="text-faint">-</span>' : `<button type="button" class="toggle ${m.active?'on':''}" role="switch" aria-checked="${m.active}" aria-label="${m.name} 활성화" onclick="this.classList.toggle('on'); this.setAttribute('aria-checked', this.classList.contains('on'));"></button>`}</td>
+      <td class="whitespace-nowrap px-4 py-3.5 text-right">
+        <button class="sig text-faint hover:text-rosewood-deep" aria-label="설정"><iconify-icon icon="solar:settings-linear" width="16"></iconify-icon></button>
+        <button class="sig ml-1 text-faint ${m.fixed?'opacity-30':'hover:text-bad'}" aria-label="삭제" ${m.fixed?'disabled':''}><iconify-icon icon="solar:trash-bin-trash-linear" width="16"></iconify-icon></button>
+        <button class="sig ml-1 text-faint hover:text-rosewood-deep" aria-label="새 창에서 보기"><iconify-icon icon="solar:square-top-up-linear" width="16"></iconify-icon></button>
+      </td>
+    </tr>`).join('');
+
+
+  // ---------- 맞춤 콘텐츠 ----------
+  const customPosts = [
+    { d:'26.07.23 20:19', t:'귀에서 계속 삐 소리가 난다면 | 일산 화정 이명 연오재한의원', s:'조용한 방에만 들어가면, 귀에서 소리가 들리시나요?', kw:'#이명난청 #어지럼증 #이명 #난청 #일산 이명 #일산 난청', seed:'c-ear' },
+    { d:'26.07.23 20:19', t:'쉬어도 회복이 안 될 때, 공진단 | 원장이 직접 조제하는 화정 연오재한의원', s:'몸이 버티는 걸 넘어서서, 이제는 버겁다고 느껴지시나요?', kw:'#공진단 #수 공진단 #공진단 효능 #공진단 가격', seed:'c-gong' },
+    { d:'26.07.23 20:18', t:'감기에 자주 걸리는 분께, 경옥고 | 화정 연오재한의원', s:'요즘 들어 부쩍 피로하신가요?', kw:'#경옥고 효능 #경옥고 가격 #일산 경옥고 #경옥고 선물', seed:'c-kyung' },
+    { d:'26.07.23 20:17', t:'소아 성장클리닉, 검사부터 한약까지 | 화정 소아 성장 연오재한의원', s:'우리 아이 키 고민, 어떻게 하면 좋을까요?', kw:'#소아성장 #일산 소아성장 #화정 소아성장 #성장치료', seed:'c-kid' },
+    { d:'26.07.23 20:17', t:'몸이 편한 속도로 빼는 다이어트, 연오재 | 고양시 다이어트 한의원', s:'평생의 숙제, 다이어트 무리하지 않아야 오래갑니다.', kw:'#다이어트한약 #한방다이어트 #다이어트한약 부작용', seed:'c-diet' },
+    { d:'26.07.23 20:16', t:'사고 며칠 뒤에 시작되는 통증 | 화정 교통사고 연오재 한의원', s:'사고 당일에는 괜찮았는데, 왜 며칠이 지나서야 아픈걸까요?', kw:'#교통사고 한의원 #교통사고 후유증 #자동차보험 한방치료', seed:'c-acc' },
+    { d:'26.07.23 20:15', t:'뒷목부터 어깨까지 뭉치는 통증 | 화정 추나 연오재한의원', s:'모니터 앞에만 앉으면 어깨가 돌처럼 굳으시나요?', kw:'#일자목 #거북목 #추나요법 #어깨통증 한의원', seed:'c-neck' },
+    { d:'26.07.23 20:14', t:'먹으면 더부룩하고 소화가 안 될 때 | 화정 소화불량 연오재한의원', s:'속이 편한 날이 손에 꼽히시나요?', kw:'#소화불량 #위장장애 #담적 #일산 소화불량 한의원', seed:'c-digest' },
+    { d:'26.07.23 20:13', t:'밤에 자꾸 깨는 분들께 | 화정 불면 연오재한의원', s:'누우면 오히려 정신이 말똥해지시나요?', kw:'#불면증 #수면장애 #불면 한약 #일산 불면증', seed:'c-sleep' },
+    { d:'26.07.23 20:12', t:'수험생 집중력이 걱정될 때, 총명탕 | 화정 연오재한의원', s:'책상 앞에 오래 앉아도 머리가 무겁다면?', kw:'#총명탕 #수험생 보약 #집중력 #기억력 한약', seed:'c-study' },
+    { d:'26.07.23 20:11', t:'출산 후 몸조리, 산후보약 | 화정 산후조리 연오재한의원', s:'출산 후 회복, 시기를 놓치면 오래갑니다.', kw:'#산후보약 #산후조리 #산후풍 #일산 산후보약', seed:'c-postp' },
+    { d:'26.07.23 20:10', t:'환절기마다 반복되는 비염 | 화정 비염 연오재한의원', s:'아침마다 재채기로 하루를 시작하시나요?', kw:'#비염 #알레르기비염 #코막힘 #비염 한약', seed:'c-nose' },
+    { d:'26.07.23 20:09', t:'갱년기, 몸의 변화를 다스리는 법 | 화정 연오재한의원', s:'이유 없이 열이 오르고 잠이 얕아지셨나요?', kw:'#갱년기 #갱년기 한약 #안면홍조 #일산 갱년기', seed:'c-meno' },
+    { d:'26.07.23 20:08', t:'반복되는 두통, 원인부터 살핍니다 | 화정 두통 연오재한의원', s:'진통제로 버티는 하루, 이제 원인을 봐야 할 때입니다.', kw:'#두통 #편두통 #긴장성두통 #두통 한의원', seed:'c-head' },
+  ];
+  let customKeyword = '';
+  function renderCustom() {
+    const rows = customPosts.filter(p => p.t.includes(customKeyword));
+    document.getElementById('customCount').textContent = rows.length;
+    document.getElementById('customBody').innerHTML = rows.map(p => `
+      <tr class="hover:bg-linesoft/40">
+        <td class="tnum whitespace-nowrap px-4 py-4 text-mocha">${p.d}</td>
+        <td class="px-2 py-4">
+          <span class="flex items-start gap-3.5">
+            <img src="https://picsum.photos/seed/adm-${p.seed}/96/96" alt="" class="h-12 w-12 shrink-0 rounded-lg object-cover" loading="lazy" decoding="async">
+            <span class="min-w-0">
+              <span class="flex items-center gap-2">
+                <span class="flex items-center gap-1 rounded-full border border-rosewood/25 bg-rosewood/8 px-2 py-0.5 text-[10px] font-bold text-rosewood-deep"><i class="h-1.5 w-1.5 rounded-full bg-rosewood"></i>NEW</span>
+                <b class="break-keep leading-snug">${p.t}</b>
+              </span>
+              <span class="mt-1 block break-keep text-[12.5px] text-mocha">${p.s}</span>
+            </span>
+          </span>
+        </td>
+        <td class="whitespace-nowrap px-2 py-4"><span class="rounded-full border border-line px-2.5 py-1 text-[11px] font-semibold text-mocha">게시 전</span></td>
+        <td class="whitespace-nowrap px-2 py-4 font-medium text-mocha">한의원 소개</td>
+        <td class="max-w-[190px] px-2 py-4 text-[12px] leading-relaxed text-mocha">${p.kw}</td>
+        <td class="whitespace-nowrap px-4 py-4 text-right">
+          <button type="button" class="sig rounded-xl border border-line px-3.5 py-2 text-[12px] font-semibold hover:bg-linesoft">원본 글</button>
+          <button type="button" class="sig ml-1.5 rounded-xl bg-rosewood-deep px-3.5 py-2 text-[12px] font-semibold text-ivory hover:bg-pine" onclick="openEditor(${customPosts.indexOf(p)})">검토 후 게시</button>
+        </td>
+      </tr>`).join('');
+  }
+  renderCustom();
+  document.getElementById('customSearch').addEventListener('input', (e) => { customKeyword = e.target.value.trim(); renderCustom(); });
+
+  // ---------- 검토·게시 에디터 ----------
+  const editorModal = document.getElementById('editorModal');
+  const edTitle = document.getElementById('edTitle');
+  edTitle.addEventListener('input', () => { document.getElementById('edTitleCount').textContent = edTitle.value.length; });
+  window.openEditor = (i) => {
+    const p = customPosts[i];
+    edTitle.value = p.t;
+    document.getElementById('edTitleCount').textContent = p.t.length;
+    document.getElementById('edSub').value = p.s;
+    document.getElementById('edBody').innerHTML = `
+      <p><b>${p.s}</b></p>
+      <p class="mt-6"><b>안녕하세요,<br>연오재한의원 김경민 원장입니다.</b></p>
+      <p class="mt-5 break-keep">저는 처방에 앞서, 지금 드시는 약과 전반적인 몸 상태부터 살핍니다. 이 글에서는 이 증상이 왜 생기는지, 한의원에서는 어떤 약과 치료로 접근하는지, 그리고 실제 진료는 어떻게 진행되는지 차례로 말씀드리겠습니다.</p>
+      <p class="mt-6"><b>왜 생길까요?</b></p>
+      <p class="mt-3 break-keep text-mocha">(검토 후 본문을 이어서 작성해 주세요. 이미지·표·네이버 예약 버튼은 우측 도구에서 추가할 수 있습니다.)</p>`;
+    editorModal.showModal();
+  };
+  window.publishCustom = () => {
+    alert('게시글이 「' + document.getElementById('edBoard').value + '」 게시판에 게시되었습니다. (데모)');
+    editorModal.close();
+  };
+
+  // ---------- 팝업 활성화 토글 ----------
+  document.getElementById('popupActive').addEventListener('click', (e) => {
+    const b = e.target.closest('button'); if (!b) return;
+    document.querySelectorAll('#popupActive button').forEach(x => { x.className = 'sig px-4 py-2 text-[12.5px] font-semibold text-mocha hover:bg-linesoft'; });
+    b.className = 'sig bg-rosewood-deep px-4 py-2 text-[12.5px] font-semibold text-ivory';
+  });
+
+
+  // ---------- 상품 수정 ----------
+  const fmt = (n) => n.toLocaleString('ko-KR');
+  function supplyText(v) {
+    const n = parseInt(String(v).replace(/[^0-9]/g,'')) || 0;
+    const supply = Math.round(n / 1.1), vat = n - supply;
+    return `공급가 ${fmt(supply)}원 / 부가세 ${fmt(vat)}원`;
+  }
+  function bindPrice(inputId, outId) {
+    const el = document.getElementById(inputId), out = document.getElementById(outId);
+    el.addEventListener('input', () => {
+      const n = parseInt(el.value.replace(/[^0-9]/g,'')) || 0;
+      el.value = n ? fmt(n) : '';
+      out.textContent = supplyText(n);
+    });
+  }
+  bindPrice('pePrice','peSupply1'); bindPrice('peSale','peSupply2');
+  const peCTitle = document.getElementById('peCTitle');
+  peCTitle.addEventListener('input', () => { document.getElementById('peCTitleCount').textContent = peCTitle.value.length; });
+  document.querySelectorAll('#view-prodedit .seg').forEach(seg => seg.addEventListener('click', (e) => {
+    const b = e.target.closest('button'); if (!b) return;
+    seg.querySelectorAll('button').forEach(x => x.className = 'sig px-4 py-2 font-semibold text-mocha hover:bg-linesoft');
+    b.className = 'bg-rosewood-deep px-4 py-2 font-semibold text-ivory';
+  }));
+  let curProdIdx = null;
+  window.openProdEdit = (i) => {
+    curProdIdx = i;
+    const p = products[i];
+    document.getElementById('peName').value = p.n;
+    document.getElementById('peDesc').value = p.desc;
+    document.getElementById('peImg').src = 'https://picsum.photos/seed/adm-' + p.seed + '/900/620';
+    document.getElementById('peThumb').src = 'https://picsum.photos/seed/adm-' + p.seed + '/120/120';
+    document.getElementById('pePrice').value = fmt(p.price || 999999);
+    document.getElementById('peSale').value = fmt(p.sale || 999999);
+    document.getElementById('peSupply1').textContent = supplyText(p.price || 999999);
+    document.getElementById('peSupply2').textContent = supplyText(p.sale || 999999);
+    document.querySelectorAll('.side-link').forEach(x => x.classList.remove('on'));
+    document.querySelectorAll('.view').forEach(x => x.classList.remove('on'));
+    document.getElementById('view-prodedit').classList.add('on');
+    document.getElementById('pageTitle').textContent = '상품 수정';
+    window.scrollTo({ top: 0 });
+  };
+
+  window.saveProdEdit = () => {
+    if (curProdIdx === null) return;
+    const num = (id) => parseInt(document.getElementById(id).value.replace(/[^0-9]/g,'')) || 0;
+    products[curProdIdx].n = document.getElementById('peName').value.trim() || products[curProdIdx].n;
+    products[curProdIdx].desc = document.getElementById('peDesc').value.trim();
+    products[curProdIdx].price = num('pePrice');
+    products[curProdIdx].sale = num('peSale');
+    if (window.YO_STORE) YO_STORE.update(db => { db.products = products; });
+    renderProducts();
+    alert('저장되었습니다. 홈페이지 원내 상품 영역에 반영됩니다.');
+    backToProducts();
+  };
+  window.backToProducts = () => {
+    document.querySelectorAll('.view').forEach(x => x.classList.remove('on'));
+    document.getElementById('view-products').classList.add('on');
+    document.getElementById('pageTitle').textContent = '상품 등록·수정';
+    document.querySelectorAll('.side-link').forEach(x => x.classList.remove('on'));
+    document.querySelector('.side-link[data-view="products"]').classList.add('on');
+  };
+
+
+  // ---------- 빠른 상담 (홈페이지 연동 수신함) ----------
+  window.renderQuick = () => {
+    const list = window.YO_STORE ? YO_STORE.get().consultations : [];
+    const wrap = document.getElementById('quickWrap');
+    const waiting = list.filter(c => c.status === '대기').length;
+    const badge = document.getElementById('dashQuickCount');
+    if (badge) badge.textContent = waiting + '건';
+    if (!list.length) {
+      wrap.innerHTML = `<div class="flex flex-col items-center justify-center py-24 text-center">
+        <span class="flex h-16 w-16 items-center justify-center rounded-full bg-linesoft text-faint"><iconify-icon icon="solar:phone-calling-linear" width="28"></iconify-icon></span>
+        <p class="mt-4 text-[14px] font-semibold text-mocha">접수된 상담 요청이 없습니다.</p>
+        <p class="mt-1 text-[12.5px] text-faint">홈페이지에서 상담 신청이 들어오면 이곳에 표시됩니다.</p></div>`;
+      return;
+    }
+    wrap.innerHTML = `<table class="w-full min-w-[680px] text-left text-[13px]">
+      <thead><tr class="border-b border-linesoft text-[11.5px] font-semibold uppercase tracking-wide text-faint">
+        <th class="px-4 py-3">신청일시</th><th class="px-2 py-3">이름</th><th class="px-2 py-3">연락처</th><th class="px-2 py-3">상태</th><th class="px-4 py-3 text-right">처리</th>
+      </tr></thead>
+      <tbody class="divide-y divide-linesoft">` + list.slice().reverse().map((c, ri) => {
+        const i = list.length - 1 - ri;
+        return `<tr class="hover:bg-linesoft/40">
+          <td class="tnum px-4 py-3.5 text-mocha">${c.at}</td>
+          <td class="px-2 py-3.5 font-semibold">${c.name}</td>
+          <td class="tnum px-2 py-3.5">${c.phone}</td>
+          <td class="px-2 py-3.5">${c.status === '대기'
+            ? '<span class="rounded-full bg-warnbg px-2.5 py-1 text-[11px] font-bold text-warn">대기</span>'
+            : '<span class="rounded-full bg-goodbg px-2.5 py-1 text-[11px] font-bold text-good">확인 완료</span>'}</td>
+          <td class="px-4 py-3.5 text-right">${c.status === '대기'
+            ? `<button type="button" class="sig rounded-xl bg-rosewood-deep px-3.5 py-2 text-[12px] font-semibold text-ivory hover:bg-pine" onclick="resolveQuick(${i})">확인 처리</button>`
+            : '<span class="text-[12px] text-faint">-</span>'}</td>
+        </tr>`;
+      }).join('') + '</tbody></table>';
+  };
+  window.resolveQuick = (i) => {
+    if (window.YO_STORE) YO_STORE.update(db => { if (db.consultations[i]) db.consultations[i].status = '확인'; });
+    renderQuick();
+  };
+  renderQuick();
+
+  // ---------- view switching ----------
+  const titles = { dash:'운영 현황', menus:'상단 메뉴 관리', custom:'맞춤 콘텐츠', popup:'팝업 설정', prodedit:'상품 수정', quick:'빠른 상담', posts:'게시글 관리', members:'회원 관리', orders:'진료 및 배송 관리', products:'상품 등록·수정', su:'수(壽) 멤버스 상품 연동', shipping:'배송·환불 안내 템플릿', stats:'방문 통계', staff:'직원 계정 관리' };
+  document.querySelectorAll('.side-link').forEach(a => a.addEventListener('click', (e) => {
+    e.preventDefault();
+    const v = a.dataset.view;
+    document.querySelectorAll('.side-link').forEach(x => x.classList.remove('on'));
+    a.classList.add('on');
+    if (v === 'generic') {
+      const t = a.dataset.title || '준비 중';
+      document.getElementById('genericTitle').textContent = t;
+      document.querySelectorAll('.view').forEach(x => x.classList.remove('on'));
+      document.getElementById('view-generic').classList.add('on');
+      document.getElementById('pageTitle').textContent = t;
+      if (window.innerWidth < 1024) sidebar.classList.add('-translate-x-full');
+      return;
+    }
+    document.querySelectorAll('.view').forEach(x => x.classList.remove('on'));
+    document.getElementById('view-'+v).classList.add('on');
+    document.getElementById('pageTitle').textContent = titles[v];
+    if (v === 'quick' || v === 'dash') renderQuick();
+    if (window.innerWidth < 1024) sidebar.classList.add('-translate-x-full');
+  }));
+
+  // mobile sidebar
+  const sidebar = document.getElementById('sidebar');
+  document.getElementById('sideToggle').addEventListener('click', () => sidebar.classList.toggle('-translate-x-full'));
+</script>
+
+</body>
+</html>
