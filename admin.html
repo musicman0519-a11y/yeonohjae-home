@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>연오재한의원 — 홈페이지 어드민</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.min.css">
+  <script src="https://code.iconify.design/iconify-icon/2.3.0/iconify-icon.min.js"></script>
+  <!-- 데이터 연결: 설정 → 저장소 → Supabase (순서 중요) -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="site-config.js"></script>
+  <script src="yeonohjae_store.js"></script>
+  <script src="yeonohjae-supabase.js"></script>
+  <script>
+    tailwind.config = {
+      theme: { extend: {
+        fontFamily: { sans: ['Pretendard','system-ui','sans-serif'] },
+        colors: {
+          ivory:'#F6F3EE', panel:'#FFFFFF', line:'#E7E1D6', linesoft:'#F0EBE2',
+          espresso:'#2F343A', mocha:'#736E66', faint:'#A39B8F',
+          rosewood:{ DEFAULT:'#4A5D4E', deep:'#3B4B3F' },
+          pine:'#243129', pine2:'#1C271F', champagne:'#90A081',
+          good:'#16794A', goodbg:'#E6F4EC', bad:'#C0362C', badbg:'#FBE9E7', warnbg:'#FDF3E3', warn:'#9C6B1F',
+        },
+      } }
+    }
+  </script>
+  <style type="text/tailwindcss">
+    @layer components {
+      .card { @apply rounded-2xl border border-line bg-panel p-6; }
+      .inp { @apply mt-2 h-[44px] w-full rounded-xl border border-line bg-ivory/50 px-4 text-[13px] font-medium; }
+      .ta { @apply mt-2 w-full rounded-xl border border-line bg-ivory/50 p-4 text-[13px] font-normal leading-relaxed; }
+      .lbl { @apply block text-[12.5px] font-bold; }
+      .hint { @apply mt-1.5 break-keep text-[11.5px] font-normal text-faint; }
+      .btn { @apply inline-flex items-center justify-center gap-1.5 rounded-full border border-line bg-panel px-4 py-2 text-[12.5px] font-semibold hover:bg-white; }
+      .btn-p { @apply inline-flex items-center justify-center gap-1.5 rounded-full bg-rosewood-deep px-5 py-2 text-[12.5px] font-semibold text-ivory hover:bg-pine; }
+      .btn-d { @apply inline-flex items-center justify-center gap-1.5 rounded-full border border-bad/30 bg-badbg px-4 py-2 text-[12.5px] font-semibold text-bad hover:brightness-95; }
+      .ico { @apply inline-flex h-8 w-8 items-center justify-center rounded-lg text-faint hover:bg-linesoft hover:text-rosewood-deep; }
+      .th { @apply border-b border-linesoft text-[11.5px] font-semibold uppercase tracking-wide text-faint; }
+      .pill-g { @apply inline-flex items-center gap-1 rounded-full bg-goodbg px-2.5 py-1 text-[11px] font-bold text-good; }
+      .pill-w { @apply inline-flex items-center gap-1 rounded-full bg-warnbg px-2.5 py-1 text-[11px] font-bold text-warn; }
+      .pill-b { @apply inline-flex items-center gap-1 rounded-full bg-badbg px-2.5 py-1 text-[11px] font-bold text-bad; }
+      .pill-n { @apply inline-flex items-center gap-1 rounded-full bg-linesoft px-2.5 py-1 text-[11px] font-bold text-mocha; }
+      .tb { @apply flex flex-col items-center gap-1 rounded-lg px-1 py-1.5 text-[10.5px] font-semibold text-mocha hover:bg-linesoft hover:text-rosewood-deep; }
+    }
+  </style>
+  <style>
+    [hidden] { display:none !important; }
+    .btn, .btn-p, .btn-d, .ico, .tb { transition: all .35s cubic-bezier(.16,1,.3,1); }
+    body { background:#F6F3EE; }
+    .break-keep { word-break: keep-all; }
+    .tnum { font-variant-numeric: tabular-nums; }
+    .sig { transition: all .35s cubic-bezier(.16,1,.3,1); }
+    input:focus-visible, button:focus-visible, a:focus-visible, select:focus-visible, textarea:focus-visible, [contenteditable]:focus-visible { outline:2px solid #4A5D4E; outline-offset:1px; }
+    .view { display:none; }
+    .view.on { display:block; animation: vin .45s cubic-bezier(.16,1,.3,1); }
+    @keyframes vin { from { opacity:0; transform: translateY(.6rem); } to { opacity:1; transform:none; } }
+    .side-link.on { background: rgba(144,160,129,.16); color:#F3EEE7; }
+    .side-link.on iconify-icon { color:#90A081; }
+    .ftab.on { color:#3B4B3F; border-color:#3B4B3F; background:#fff; }
+    .toggle { width:40px; height:22px; border-radius:999px; background:#D8D1C4; position:relative; cursor:pointer; transition:background .3s; border:none; flex-shrink:0; }
+    .toggle::after { content:""; position:absolute; top:3px; left:3px; width:16px; height:16px; border-radius:999px; background:#fff; transition:transform .3s cubic-bezier(.16,1,.3,1); box-shadow:0 1px 3px rgba(0,0,0,.2); }
+    .toggle.on { background:#4A5D4E; }
+    .toggle.on::after { transform: translateX(18px); }
+    .bar { transition: height .8s cubic-bezier(.16,1,.3,1); }
+    dialog::backdrop { background: rgba(36,49,41,.45); backdrop-filter: blur(3px); }
+    .seg button { padding:.5rem 1rem; font-weight:600; color:#736E66; }
+    .seg button.on { background:#3B4B3F; color:#F6F3EE; }
+    /* 편집기 본문 */
+    .rich { font-size:14.5px; line-height:1.8; word-break:keep-all; }
+    .rich:empty::before { content: attr(data-placeholder); color:#A39B8F; }
+    .rich p { margin:0 0 .8em; } .rich h3 { font-size:1.2em; font-weight:700; margin:1.2em 0 .5em; }
+    .rich img { max-width:100%; border-radius:.8rem; margin:.8em 0; }
+    .rich ul { list-style:disc; padding-left:1.3em; } .rich ol { list-style:decimal; padding-left:1.3em; }
+    .rich a { color:#3B4B3F; text-decoration:underline; }
+    .rich hr { border:0; height:1px; background:#E7E1D6; margin:1.5em 0; }
+    .rich iframe { width:100%; aspect-ratio:16/9; height:auto; border-radius:.8rem; }
+    .rich table { width:100%; border-collapse:collapse; } .rich td, .rich th { border:1px solid #E7E1D6; padding:.4em .6em; min-width:3em; }
+    #toast { transition: opacity .3s, transform .3s; }
+  </style>
+</head>
+<body class="font-sans text-espresso antialiased">
+
+<!-- ===== 로그인 / 관리자 신청 ===== -->
+<div id="auth" hidden class="fixed inset-0 z-[90] flex items-center justify-center bg-pine p-5">
+  <div class="w-full max-w-[400px] rounded-3xl bg-ivory p-8 shadow-2xl">
+    <div class="flex items-center gap-2.5">
+      <span class="flex h-10 w-10 items-center justify-center rounded-xl bg-rosewood/15 text-rosewood-deep"><iconify-icon icon="solar:leaf-bold" width="20"></iconify-icon></span>
+      <div class="leading-none"><p class="text-[16px] font-extrabold">연오재한의원</p><p class="mt-1 text-[11px] font-semibold text-mocha">홈페이지 관리자</p></div>
+    </div>
+
+    <form id="fLogin" class="mt-7 space-y-3" data-pane>
+      <p class="text-[15px] font-bold">로그인</p>
+      <input name="email" type="email" required autocomplete="username" placeholder="이메일" class="inp">
+      <input name="pw" type="password" required autocomplete="current-password" placeholder="비밀번호" class="inp">
+      <button class="btn-p mt-2 h-[46px] w-full text-[13.5px]">로그인</button>
+      <div class="flex justify-between pt-1 text-[12px] font-semibold text-mocha">
+        <button type="button" data-go="fApply" class="hover:text-rosewood-deep">관리자 신청</button>
+        <button type="button" data-go="fReset" class="hover:text-rosewood-deep">비밀번호를 잊으셨나요?</button>
+      </div>
+    </form>
+
+    <form id="fApply" hidden class="mt-7 space-y-3" data-pane>
+      <p class="text-[15px] font-bold">관리자 신청</p>
+      <p class="break-keep text-[12px] leading-relaxed text-mocha">신청 후 이메일 인증을 하고, 원장님(최고관리자)이 승인하면 로그인할 수 있습니다.</p>
+      <input name="name" required maxlength="30" placeholder="이름 (예: 김간호)" class="inp">
+      <input name="email" type="email" required autocomplete="username" placeholder="이메일" class="inp">
+      <input name="pw" type="password" required minlength="8" autocomplete="new-password" placeholder="비밀번호 (8자 이상)" class="inp">
+      <button class="btn-p mt-2 h-[46px] w-full text-[13.5px]">신청하기</button>
+      <button type="button" data-go="fLogin" class="w-full pt-1 text-[12px] font-semibold text-mocha hover:text-rosewood-deep">← 로그인으로</button>
+    </form>
+
+    <form id="fReset" hidden class="mt-7 space-y-3" data-pane>
+      <p class="text-[15px] font-bold">비밀번호 찾기</p>
+      <p class="break-keep text-[12px] text-mocha">가입한 이메일로 비밀번호 재설정 링크를 보내 드립니다.</p>
+      <input name="email" type="email" required placeholder="이메일" class="inp">
+      <button class="btn-p mt-2 h-[46px] w-full text-[13.5px]">재설정 메일 받기</button>
+      <button type="button" data-go="fLogin" class="w-full pt-1 text-[12px] font-semibold text-mocha hover:text-rosewood-deep">← 로그인으로</button>
+    </form>
+
+    <form id="fNewPw" hidden class="mt-7 space-y-3" data-pane>
+      <p class="text-[15px] font-bold">새 비밀번호 설정</p>
+      <input name="pw" type="password" required minlength="8" autocomplete="new-password" placeholder="새 비밀번호 (8자 이상)" class="inp">
+      <button class="btn-p mt-2 h-[46px] w-full text-[13.5px]">변경하기</button>
+    </form>
+
+    <div id="pWait" hidden class="mt-7" data-pane>
+      <p class="text-[15px] font-bold" id="waitTitle">승인 대기 중</p>
+      <p class="mt-2 break-keep text-[13px] leading-relaxed text-mocha" id="waitMsg"></p>
+      <div class="mt-5 flex gap-2"><button type="button" class="btn" onclick="location.reload()">다시 확인</button><button type="button" class="btn" onclick="logout()">로그아웃</button></div>
+    </div>
+
+    <p id="authMsg" class="mt-4 min-h-[1.2em] break-keep text-[12.5px] font-semibold text-bad"></p>
+  </div>
+</div>
+
+<div class="flex min-h-[100dvh]">
+
+  <!-- ===== SIDEBAR ===== -->
+  <aside class="fixed inset-y-0 left-0 z-40 flex w-[248px] -translate-x-full flex-col bg-pine text-[#B9C3BA] transition-transform duration-300 lg:static lg:translate-x-0" id="sidebar">
+    <div class="flex items-center gap-2.5 px-5 pb-5 pt-6">
+      <span class="flex h-9 w-9 items-center justify-center rounded-xl bg-champagne/20 text-champagne"><iconify-icon icon="solar:leaf-bold" width="18"></iconify-icon></span>
+      <div class="leading-none">
+        <p class="text-[14.5px] font-extrabold text-ivory">연오재한의원</p>
+        <p class="mt-1 text-[10px] font-semibold uppercase tracking-[0.22em] text-[#7E8B80]">홈페이지 어드민</p>
+      </div>
+    </div>
+
+    <nav class="flex-1 overflow-y-auto px-3 pb-4 text-[13.5px] font-medium">
+      <a href="#" data-view="dash" class="side-link sig on flex items-center gap-2.5 rounded-xl px-3 py-2.5 hover:bg-white/5"><iconify-icon icon="solar:widget-4-linear" width="17"></iconify-icon> 홈</a>
+
+      <details open class="group/menu" data-role="edit">
+        <summary class="sig flex cursor-pointer list-none items-center justify-between rounded-xl px-3 py-2.5 hover:bg-white/5">
+          <span class="flex items-center gap-2.5"><iconify-icon icon="solar:magic-stick-3-linear" width="17"></iconify-icon> 콘텐츠</span>
+          <iconify-icon icon="solar:alt-arrow-down-linear" width="14" class="transition-transform group-open/menu:rotate-180"></iconify-icon>
+        </summary>
+        <div class="mb-1 ml-4 space-y-0.5 border-l border-white/10 pl-3 text-[13px]">
+          <a href="#" data-view="menus" class="side-link sig block rounded-lg px-3 py-2 hover:bg-white/5">상단 메뉴 관리</a>
+          <a href="#" data-view="posts" class="side-link sig block rounded-lg px-3 py-2 hover:bg-white/5">게시글 관리</a>
+          <a href="#" data-view="custom" class="side-link sig block rounded-lg px-3 py-2 hover:bg-white/5">맞춤 콘텐츠</a>
+          <a href="#" data-view="popup" class="side-link sig block rounded-lg px-3 py-2 hover:bg-white/5">팝업 설정</a>
+          <a href="#" data-view="home" class="side-link sig block rounded-lg px-3 py-2 hover:bg-white/5">홈 화면 꾸미기</a>
+          <a href="#" data-view="doctors" class="side-link sig block rounded-lg px-3 py-2 hover:bg-white/5">의료진 관리</a>
+          <a href="#" data-view="gallery" class="side-link sig block rounded-lg px-3 py-2 hover:bg-white/5">사진첩 관리</a>
+        </div>
+      </details>
+
+      <a href="#" data-view="generic" data-title="회원 관리" data-role="edit" class="side-link sig flex items-center gap-2.5 rounded-xl px-3 py-2.5 hover:bg-white/5"><iconify-icon icon="solar:users-group-rounded-linear" width="17"></iconify-icon> 회원 관리</a>
+
+      <details open class="group/menu">
+        <summary class="sig flex cursor-pointer list-none items-center justify-between rounded-xl px-3 py-2.5 hover:bg-white/5">
+          <span class="flex items-center gap-2.5"><iconify-icon icon="solar:stethoscope-linear" width="17"></iconify-icon> 진료 관리</span>
+          <iconify-icon icon="solar:alt-arrow-down-linear" width="14" class="transition-transform group-open/menu:rotate-180"></iconify-icon>
+        </summary>
+        <div class="mb-1 ml-4 space-y-0.5 border-l border-white/10 pl-3 text-[13px]">
+          <a href="#" data-view="quick" class="side-link sig flex items-center justify-between rounded-lg px-3 py-2 hover:bg-white/5">빠른 상담 · 예약 <span id="sideQuick" hidden class="tnum rounded-full bg-champagne px-1.5 text-[10.5px] font-bold text-pine"></span></a>
+          <a href="#" data-view="generic" data-title="진료 및 배송 관리" data-role="edit" class="side-link sig block rounded-lg px-3 py-2 hover:bg-white/5">진료 및 배송 관리</a>
+        </div>
+      </details>
+
+      <details open class="group/menu" data-role="edit">
+        <summary class="sig flex cursor-pointer list-none items-center justify-between rounded-xl px-3 py-2.5 hover:bg-white/5">
+          <span class="flex items-center gap-2.5"><iconify-icon icon="solar:box-linear" width="17"></iconify-icon> 상품 관리</span>
+          <iconify-icon icon="solar:alt-arrow-down-linear" width="14" class="transition-transform group-open/menu:rotate-180"></iconify-icon>
+        </summary>
+        <div class="mb-1 ml-4 space-y-0.5 border-l border-white/10 pl-3 text-[13px]">
+          <a href="#" data-view="products" class="side-link sig block rounded-lg px-3 py-2 hover:bg-white/5">상품 등록·수정</a>
+          <a href="#" data-view="generic" data-title="수(壽) 멤버스 상품 연동" class="side-link sig block rounded-lg px-3 py-2 hover:bg-white/5">수(壽) 멤버스 상품 연동</a>
+          <a href="#" data-view="generic" data-title="린다이어트 상품 연동" class="side-link sig block rounded-lg px-3 py-2 hover:bg-white/5">린다이어트 상품 연동</a>
+          <a href="#" data-view="generic" data-title="레이시올로지 상품 연동" class="side-link sig block rounded-lg px-3 py-2 hover:bg-white/5">레이시올로지 상품 연동</a>
+          <a href="#" data-view="shipping" class="side-link sig block rounded-lg px-3 py-2 hover:bg-white/5">배송·환불 안내 템플릿</a>
+        </div>
+      </details>
+
+      <details open class="group/menu" data-role="edit">
+        <summary class="sig flex cursor-pointer list-none items-center justify-between rounded-xl px-3 py-2.5 hover:bg-white/5">
+          <span class="flex items-center gap-2.5"><iconify-icon icon="solar:chart-2-linear" width="17"></iconify-icon> 통계</span>
+          <iconify-icon icon="solar:alt-arrow-down-linear" width="14" class="transition-transform group-open/menu:rotate-180"></iconify-icon>
+        </summary>
+        <div class="mb-1 ml-4 space-y-0.5 border-l border-white/10 pl-3 text-[13px]">
+          <a href="#" data-view="stats" class="side-link sig block rounded-lg px-3 py-2 hover:bg-white/5">방문 통계</a>
+          <a href="#" data-view="generic" data-title="매출 통계" class="side-link sig block rounded-lg px-3 py-2 hover:bg-white/5">매출 통계</a>
+        </div>
+      </details>
+
+      <a href="#" data-view="generic" data-title="결제" data-role="edit" class="side-link sig flex items-center gap-2.5 rounded-xl px-3 py-2.5 hover:bg-white/5"><iconify-icon icon="solar:card-linear" width="17"></iconify-icon> 결제</a>
+      <a href="#" data-view="staff" class="side-link sig flex items-center gap-2.5 rounded-xl px-3 py-2.5 hover:bg-white/5"><iconify-icon icon="solar:shield-user-linear" width="17"></iconify-icon> 직원 계정 관리 <span id="sideStaff" hidden class="tnum ml-auto rounded-full bg-champagne px-1.5 text-[10.5px] font-bold text-pine"></span></a>
+      <a href="#" data-view="generic" data-title="서비스 연동" data-role="edit" class="side-link sig flex items-center gap-2.5 rounded-xl px-3 py-2.5 hover:bg-white/5"><iconify-icon icon="solar:link-circle-linear" width="17"></iconify-icon> 서비스 연동</a>
+      <a href="#" data-view="settings" data-role="edit" class="side-link sig flex items-center gap-2.5 rounded-xl px-3 py-2.5 hover:bg-white/5"><iconify-icon icon="solar:settings-linear" width="17"></iconify-icon> 설정 (의원 정보)</a>
+    </nav>
+
+    <div class="border-t border-white/10 px-3 py-4 text-[12.5px] font-medium">
+      <a href="index.html" target="_blank" class="sig flex items-center justify-between rounded-xl px-3 py-2 hover:bg-white/5">홈페이지 보기 <iconify-icon icon="solar:square-top-up-linear" width="14"></iconify-icon></a>
+      <button type="button" onclick="logout()" id="btnLogout" class="sig flex w-full items-center justify-between rounded-xl px-3 py-2 hover:bg-white/5">로그아웃 <iconify-icon icon="solar:logout-2-linear" width="14"></iconify-icon></button>
+    </div>
+  </aside>
+
+  <!-- ===== MAIN ===== -->
+  <div class="flex min-w-0 flex-1 flex-col">
+    <div id="previewBar" hidden class="bg-warnbg px-4 py-2 text-center text-[12px] font-semibold text-warn">
+      미리보기 모드 — 아직 DB(Supabase)가 연결되지 않아, 저장한 내용은 <b>이 컴퓨터 브라우저에만</b> 보관됩니다. site-config.js 에 주소·키를 넣으면 실제 저장됩니다.
+    </div>
+    <header class="sticky top-0 z-30 flex items-center justify-between gap-3 border-b border-line bg-ivory/90 px-4 py-3 backdrop-blur-md sm:px-6">
+      <div class="flex items-center gap-2.5">
+        <button type="button" id="sideToggle" class="sig flex h-9 w-9 items-center justify-center rounded-xl border border-line bg-panel text-espresso lg:hidden" aria-label="메뉴 열기"><iconify-icon icon="solar:hamburger-menu-linear" width="18"></iconify-icon></button>
+        <h1 class="text-[16.5px] font-bold" id="pageTitle">운영 현황</h1>
+      </div>
+      <div class="flex items-center gap-2">
+        <a href="index.html" target="_blank" class="sig hidden items-center gap-1.5 rounded-full border border-rosewood/25 bg-panel px-4 py-2 text-[12.5px] font-semibold text-rosewood-deep hover:bg-white sm:flex"><iconify-icon icon="solar:square-top-up-linear" width="14"></iconify-icon> 사이트 바로가기</a>
+        <button type="button" onclick="showView('quick')" class="sig relative flex h-9 w-9 items-center justify-center rounded-full border border-line bg-panel" aria-label="새 상담 요청">
+          <iconify-icon icon="solar:bell-linear" width="17"></iconify-icon>
+          <span id="bellCount" hidden class="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-rosewood px-1 text-[9px] font-bold text-ivory"></span>
+        </button>
+        <div class="flex items-center gap-2 rounded-full border border-line bg-panel py-1 pl-1 pr-3">
+          <span class="flex h-7 w-7 items-center justify-center rounded-full bg-rosewood/15 text-[11px] font-bold text-rosewood-deep" id="meBadge">연오</span>
+          <span class="hidden text-[12.5px] font-semibold sm:block" id="meName">연오재한의원</span>
+        </div>
+      </div>
+    </header>
+
+    <main class="flex-1 px-4 py-6 sm:px-6 lg:px-8">
+
+      <!-- ===== 준비 중 (2단계) ===== -->
+      <section class="view" id="view-generic">
+        <div class="flex flex-col items-center justify-center rounded-2xl border border-line bg-panel px-6 py-24 text-center">
+          <span class="flex h-16 w-16 items-center justify-center rounded-full bg-linesoft text-faint"><iconify-icon icon="solar:settings-minimalistic-linear" width="28"></iconify-icon></span>
+          <p class="mt-4 text-[15px] font-bold" id="genericTitle">준비 중</p>
+          <p class="mt-1.5 max-w-md break-keep text-[13px] leading-relaxed text-mocha" id="genericMsg"></p>
+        </div>
+      </section>
+
+      <!-- ===== 대시보드 ===== -->
+      <section class="view on" id="view-dash">
+        <div class="flex flex-wrap items-end justify-between gap-3">
+          <div>
+            <h2 class="text-[19px] font-bold" id="dashDate">운영 현황</h2>
+            <p class="mt-1 text-[13px] text-mocha">새로 들어온 상담 요청과 홈페이지 현황을 확인하세요</p>
+          </div>
+          <button type="button" class="btn" onclick="renderDash()"><iconify-icon icon="solar:refresh-linear" width="14"></iconify-icon> 새로고침</button>
+        </div>
+        <div class="mt-6 grid grid-cols-2 gap-4 lg:grid-cols-4">
+          <button type="button" onclick="showView('quick')" class="sig rounded-2xl border border-line bg-panel p-5 text-left hover:bg-white">
+            <span class="flex h-10 w-10 items-center justify-center rounded-full bg-rosewood/10 text-rosewood-deep"><iconify-icon icon="solar:phone-calling-linear" width="19"></iconify-icon></span>
+            <p class="mt-3 text-[12.5px] font-semibold text-mocha">연락 대기 상담</p><p class="tnum mt-0.5 text-[22px] font-extrabold" id="dQuick">-</p></button>
+          <button type="button" onclick="showView('stats')" data-role="edit" class="sig rounded-2xl border border-line bg-panel p-5 text-left hover:bg-white">
+            <span class="flex h-10 w-10 items-center justify-center rounded-full bg-rosewood/10 text-rosewood-deep"><iconify-icon icon="solar:eye-linear" width="19"></iconify-icon></span>
+            <p class="mt-3 text-[12.5px] font-semibold text-mocha">오늘 방문</p><p class="tnum mt-0.5 text-[22px] font-extrabold" id="dToday">-</p></button>
+          <button type="button" onclick="showView('posts')" data-role="edit" class="sig rounded-2xl border border-line bg-panel p-5 text-left hover:bg-white">
+            <span class="flex h-10 w-10 items-center justify-center rounded-full bg-rosewood/10 text-rosewood-deep"><iconify-icon icon="solar:document-text-linear" width="19"></iconify-icon></span>
+            <p class="mt-3 text-[12.5px] font-semibold text-mocha">게시 중인 글</p><p class="tnum mt-0.5 text-[22px] font-extrabold" id="dPosts">-</p></button>
+          <button type="button" onclick="showView('products')" data-role="edit" class="sig rounded-2xl border border-line bg-panel p-5 text-left hover:bg-white">
+            <span class="flex h-10 w-10 items-center justify-center rounded-full bg-rosewood/10 text-rosewood-deep"><iconify-icon icon="solar:box-linear" width="19"></iconify-icon></span>
+            <p class="mt-3 text-[12.5px] font-semibold text-mocha">판매 중인 상품</p><p class="tnum mt-0.5 text-[22px] font-extrabold" id="dProds">-</p></button>
+        </div>
+        <div class="mt-6 grid grid-cols-1 gap-5 xl:grid-cols-[1.2fr_.8fr]">
+          <div class="card">
+            <div class="flex items-center justify-between"><p class="text-[14px] font-bold">최근 상담 요청</p><button type="button" class="text-[12.5px] font-semibold text-rosewood-deep" onclick="showView('quick')">전체 보기 →</button></div>
+            <ul class="mt-3 divide-y divide-linesoft text-[13px]" id="dRecent"></ul>
+          </div>
+          <div class="card" data-role="edit">
+            <p class="text-[14px] font-bold">바로 가기</p>
+            <div class="mt-3 grid grid-cols-2 gap-2 text-[12.5px] font-semibold">
+              <button type="button" class="btn justify-start rounded-xl" onclick="openPostEditor(null,'notice')"><iconify-icon icon="solar:pen-new-square-linear" width="15"></iconify-icon> 공지 쓰기</button>
+              <button type="button" class="btn justify-start rounded-xl" onclick="openPostEditor(null,'event')"><iconify-icon icon="solar:gift-linear" width="15"></iconify-icon> 이벤트 등록</button>
+              <button type="button" class="btn justify-start rounded-xl" onclick="newProduct()"><iconify-icon icon="solar:bag-4-linear" width="15"></iconify-icon> 상품 추가</button>
+              <button type="button" class="btn justify-start rounded-xl" onclick="showView('popup')"><iconify-icon icon="solar:window-frame-linear" width="15"></iconify-icon> 팝업 설정</button>
+              <button type="button" class="btn justify-start rounded-xl" onclick="showView('home')"><iconify-icon icon="solar:home-smile-linear" width="15"></iconify-icon> 첫 화면 문구</button>
+              <button type="button" class="btn justify-start rounded-xl" onclick="showView('settings')"><iconify-icon icon="solar:clock-circle-linear" width="15"></iconify-icon> 진료시간</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== 상단 메뉴 관리 ===== -->
+      <section class="view" id="view-menus">
+        <div class="flex flex-wrap items-end justify-between gap-3">
+          <div>
+            <h2 class="text-[17px] font-bold">상단 메뉴 관리</h2>
+            <p class="mt-1 break-keep text-[13px] text-mocha">순서는 홈페이지 메뉴 순서와 같아요. 끄면 메뉴와 홈페이지의 해당 영역이 함께 숨겨집니다.</p>
+          </div>
+          <div class="flex gap-2">
+            <a href="index.html" target="_blank" class="btn"><iconify-icon icon="solar:monitor-linear" width="14"></iconify-icon>미리보기</a>
+            <button type="button" class="btn" onclick="addMenu()">+ 링크 메뉴 추가</button>
+            <button type="button" class="btn-p" onclick="saveMenus()">저장</button>
+          </div>
+        </div>
+        <div class="mt-4 overflow-x-auto rounded-2xl border border-line bg-panel">
+          <table class="w-full min-w-[820px] text-left text-[13px]">
+            <thead><tr class="th"><th class="px-4 py-3">순서</th><th class="px-2 py-3">메뉴 이름</th><th class="px-2 py-3">누르면 이동할 곳</th><th class="px-2 py-3">게시글 수</th><th class="px-2 py-3">활성화</th><th class="px-4 py-3 text-right">관리</th></tr></thead>
+            <tbody class="divide-y divide-linesoft" id="menuBody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ===== 게시글 관리 ===== -->
+      <section class="view" id="view-posts">
+        <div class="flex flex-wrap items-center justify-between gap-3">
+          <div class="flex flex-wrap gap-2 text-[13px] font-semibold" id="postTabs"></div>
+          <button type="button" class="btn-p" onclick="openPostEditor(null, activeCat === 'all' ? 'notice' : activeCat)">+ 게시글 작성</button>
+        </div>
+        <div class="mt-4 flex flex-wrap items-center justify-between gap-3">
+          <label class="flex items-center gap-2 text-[12.5px] font-semibold text-mocha">게시 상태
+            <select id="postStatus" class="rounded-xl border border-line bg-panel px-3 py-2 text-[12.5px] font-semibold text-espresso"><option value="all">전체</option><option value="pub">게시 중</option><option value="hide">비공개</option></select>
+          </label>
+          <div class="flex items-center gap-3">
+            <span class="tnum text-[12.5px] font-semibold text-mocha">총 <b class="text-espresso" id="postCount">0</b>개</span>
+            <label class="relative block">
+              <iconify-icon icon="solar:magnifer-linear" width="15" class="absolute left-3 top-1/2 -translate-y-1/2 text-faint"></iconify-icon>
+              <input id="postSearch" type="search" placeholder="제목 검색" class="w-56 rounded-xl border border-line bg-panel py-2 pl-9 pr-3 text-[12.5px] placeholder:text-faint sm:w-72">
+            </label>
+          </div>
+        </div>
+        <p class="mt-3 break-keep text-[12px] text-faint">홈페이지 각 영역에는 게시판의 위쪽 글부터 보여요 (고정 글이 가장 먼저). 화살표로 순서를 바꿀 수 있어요.</p>
+        <div class="mt-2 overflow-x-auto rounded-2xl border border-line bg-panel">
+          <table class="w-full min-w-[900px] text-left text-[13px]">
+            <thead><tr class="th"><th class="px-4 py-3 w-16">순서</th><th class="px-2 py-3">게시글 제목</th><th class="px-2 py-3">발행일</th><th class="px-2 py-3">조회수</th><th class="px-2 py-3">게시상태</th><th class="px-2 py-3">게시판</th><th class="px-4 py-3 text-right">관리</th></tr></thead>
+            <tbody id="postBody" class="divide-y divide-linesoft"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ===== 맞춤 콘텐츠 ===== -->
+      <section class="view" id="view-custom">
+        <h2 class="text-[17px] font-bold">맞춤 콘텐츠</h2>
+        <p class="mt-1 break-keep text-[13px] text-mocha">미리 준비된 초안 글이에요. 「검토 후 게시」를 눌러 내용을 고친 뒤 원하는 게시판에 올리세요.</p>
+        <div class="mt-5 flex flex-wrap items-center justify-between gap-3">
+          <select id="customFilter" class="rounded-xl border border-line bg-panel px-3 py-2 text-[12.5px] font-semibold"><option value="all">게시 이력 전체</option><option value="todo">게시 전</option><option value="done">게시 완료</option></select>
+          <div class="flex items-center gap-3">
+            <span class="tnum text-[12.5px] font-semibold text-mocha">총 <b class="text-espresso" id="customCount">0</b>개</span>
+            <label class="relative block">
+              <iconify-icon icon="solar:magnifer-linear" width="15" class="absolute left-3 top-1/2 -translate-y-1/2 text-faint"></iconify-icon>
+              <input id="customSearch" type="search" placeholder="제목을 검색해 주세요" class="w-56 rounded-xl border border-line bg-panel py-2 pl-9 pr-3 text-[12.5px] placeholder:text-faint sm:w-72">
+            </label>
+          </div>
+        </div>
+        <div class="mt-4 overflow-x-auto rounded-2xl border border-line bg-panel">
+          <table class="w-full min-w-[900px] text-left text-[13px]">
+            <thead><tr class="th"><th class="px-4 py-3">전달일</th><th class="px-2 py-3">게시글 제목</th><th class="px-2 py-3">게시 이력</th><th class="px-2 py-3">키워드</th><th class="px-4 py-3 text-right">액션</th></tr></thead>
+            <tbody class="divide-y divide-linesoft" id="customBody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ===== 팝업 설정 ===== -->
+      <section class="view" id="view-popup">
+        <div class="flex flex-wrap items-end justify-between gap-3">
+          <div><h2 class="text-[17px] font-bold">팝업 설정</h2><p class="mt-1 text-[13px] text-mocha">홈페이지 첫 화면에 뜨는 안내 창이에요. 여러 장이면 넘겨 볼 수 있어요.</p></div>
+          <button type="button" class="btn-p" onclick="savePopup()">저장</button>
+        </div>
+        <div class="card mt-5 sm:p-7">
+          <div class="flex flex-wrap items-center gap-x-10 gap-y-4">
+            <div class="flex items-center gap-4"><span class="text-[12.5px] font-bold">팝업 활성화</span>
+              <div class="seg flex overflow-hidden rounded-xl border border-line text-[12.5px]" id="popOn"><button type="button" data-v="1">활성화</button><button type="button" data-v="0">비활성화</button></div></div>
+            <div class="flex items-center gap-4"><span class="text-[12.5px] font-bold">노출 기기</span>
+              <label class="flex items-center gap-1.5 text-[13px] font-medium"><input type="checkbox" id="popPc" class="h-4 w-4 rounded accent-[#3B4B3F]"> PC</label>
+              <label class="flex items-center gap-1.5 text-[13px] font-medium"><input type="checkbox" id="popTab" class="h-4 w-4 rounded accent-[#3B4B3F]"> 태블릿</label>
+              <label class="flex items-center gap-1.5 text-[13px] font-medium"><input type="checkbox" id="popMo" class="h-4 w-4 rounded accent-[#3B4B3F]"> 모바일</label></div>
+          </div>
+          <p class="mt-6 flex items-center gap-2 rounded-xl border border-line bg-ivory/60 px-4 py-3 text-[12.5px] font-medium text-mocha"><iconify-icon icon="solar:info-circle-linear" width="15"></iconify-icon> 방문자가 「오늘 하루 보지 않기」를 누르면 그날은 다시 뜨지 않아요. 권장 크기: 가로 800px 정도의 세로형 이미지.</p>
+          <div class="mt-5 rounded-2xl border border-line">
+            <div class="flex items-center justify-between border-b border-linesoft px-5 py-4">
+              <p class="text-[13px] font-bold">팝업 이미지</p>
+              <button type="button" class="sig rounded-full border border-rosewood/30 px-3.5 py-1.5 text-[12px] font-semibold text-rosewood-deep hover:bg-rosewood/5" onclick="addPopupItem()">+ 팝업 추가</button>
+            </div>
+            <div id="popItems" class="divide-y divide-linesoft"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== 홈 화면 꾸미기 ===== -->
+      <section class="view" id="view-home">
+        <div class="flex flex-wrap items-end justify-between gap-3">
+          <div><h2 class="text-[17px] font-bold">홈 화면 꾸미기</h2><p class="mt-1 break-keep text-[13px] text-mocha">첫 화면 문구·사진, 다이어트 숫자, 유튜브 영상, 비대면 배너를 바꿔요. 제목에서 <b>*별표*</b>로 감싼 글자는 초록색으로 강조돼요.</p></div>
+          <div class="flex gap-2"><a href="index.html" target="_blank" class="btn">미리보기</a><button type="button" class="btn-p" onclick="saveHome()">저장</button></div>
+        </div>
+        <div class="mt-5 grid grid-cols-1 gap-5 xl:grid-cols-2">
+          <div class="card space-y-4">
+            <p class="text-[14px] font-bold">첫 화면</p>
+            <label class="lbl">작은 영문 머리말<input id="hEyebrow" class="inp"></label>
+            <label class="lbl">큰 제목 <span class="font-normal text-faint">(줄바꿈 그대로 표시)</span><textarea id="hTitle" rows="4" class="ta"></textarea></label>
+            <label class="lbl">설명 문구<textarea id="hSub" rows="3" class="ta"></textarea></label>
+            <div><span class="lbl">첫 화면 사진</span><div class="mt-2 flex items-center gap-3"><img id="hImg" alt="" class="h-24 w-20 rounded-xl bg-linesoft object-cover"><button type="button" class="btn" onclick="pickTo('hImg')">사진 바꾸기</button></div></div>
+            <label class="lbl">사진 위 작은 카드 — 윗줄<input id="hBadgeTop" class="inp"></label>
+            <label class="lbl">사진 위 작은 카드 — 문구<textarea id="hBadge" rows="2" class="ta"></textarea></label>
+          </div>
+          <div class="space-y-5">
+            <div class="card space-y-3">
+              <p class="text-[14px] font-bold">다이어트 영역 숫자 3칸</p>
+              <div id="hStats" class="grid grid-cols-3 gap-2"></div>
+            </div>
+            <div class="card space-y-3">
+              <div class="flex items-center justify-between"><p class="text-[14px] font-bold">유튜브 영상</p><button type="button" class="btn" onclick="addVideo()">+ 영상 추가</button></div>
+              <label class="lbl">영역 제목<input id="hVideoTitle" class="inp"></label>
+              <div id="hVideos" class="space-y-3"></div>
+              <p class="hint">유튜브 주소만 넣으면 썸네일이 자동으로 나와요. 영상이 하나도 없으면 영역이 숨겨져요.</p>
+            </div>
+            <div class="card space-y-4">
+              <p class="text-[14px] font-bold">비대면 진료 배너 · 기타</p>
+              <label class="lbl">배너 문구<textarea id="hTele" rows="2" class="ta"></textarea></label>
+              <div><span class="lbl">배너 배경 사진</span><div class="mt-2 flex items-center gap-3"><img id="hTeleImg" alt="" class="h-14 w-40 rounded-xl bg-linesoft object-cover"><button type="button" class="btn" onclick="pickTo('hTeleImg')">사진 바꾸기</button></div></div>
+              <label class="lbl">후기 아래 안내 문구<input id="hReviewNote" class="inp"></label>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== 의료진 관리 ===== -->
+      <section class="view" id="view-doctors">
+        <div class="flex flex-wrap items-end justify-between gap-3">
+          <div><h2 class="text-[17px] font-bold">의료진 관리</h2><p class="mt-1 text-[13px] text-mocha">홈페이지 「의료진 소개」에 보이는 순서대로 표시돼요.</p></div>
+          <div class="flex gap-2"><button type="button" class="btn" onclick="addDoctor()">+ 의료진 추가</button><button type="button" class="btn-p" onclick="saveDoctors()">저장</button></div>
+        </div>
+        <div id="docList" class="mt-5 grid grid-cols-1 gap-5 md:grid-cols-2 2xl:grid-cols-3"></div>
+      </section>
+
+      <!-- ===== 사진첩 관리 ===== -->
+      <section class="view" id="view-gallery">
+        <div class="flex flex-wrap items-end justify-between gap-3">
+          <div><h2 class="text-[17px] font-bold">사진첩 관리</h2><p class="mt-1 text-[13px] text-mocha">여러 장을 한 번에 올릴 수 있어요. 사진은 자동으로 가볍게 줄여서 저장돼요.</p></div>
+          <div class="flex gap-2"><button type="button" class="btn" onclick="addGallery()">+ 사진 올리기</button><button type="button" class="btn-p" onclick="saveGallery()">저장</button></div>
+        </div>
+        <div id="galList" class="mt-5 grid grid-cols-2 gap-4 md:grid-cols-4 xl:grid-cols-5"></div>
+      </section>
+
+      <!-- ===== 빠른 상담 · 예약 ===== -->
+      <section class="view" id="view-quick">
+        <div class="flex flex-wrap items-center justify-between gap-3">
+          <div class="flex flex-wrap gap-2 text-[13px] font-semibold" id="quickTabs">
+            <button data-f="all" class="ftab on sig rounded-full border border-line bg-panel px-4 py-1.5 text-mocha">전체</button>
+            <button data-f="미확정" class="ftab sig rounded-full border border-line bg-panel px-4 py-1.5 text-mocha">연락 대기</button>
+            <button data-f="확정" class="ftab sig rounded-full border border-line bg-panel px-4 py-1.5 text-mocha">연락 완료</button>
+            <button data-f="취소" class="ftab sig rounded-full border border-line bg-panel px-4 py-1.5 text-mocha">취소</button>
+          </div>
+          <div class="flex gap-2">
+            <button type="button" class="btn" onclick="loadQuick()"><iconify-icon icon="solar:refresh-linear" width="14"></iconify-icon>새로고침</button>
+            <button type="button" class="btn-p" onclick="quickModal.showModal()">+ 직접 등록</button>
+          </div>
+        </div>
+        <p class="mt-3 break-keep text-[12.5px] text-mocha">홈페이지 상담 신청 폼으로 접수된 요청이에요. 연락드린 뒤 「연락 완료」를 눌러 주세요. 접수 기록은 1년 뒤 자동으로 지워져요.</p>
+        <div class="mt-3 overflow-x-auto rounded-2xl border border-line bg-panel" id="quickWrap"></div>
+      </section>
+
+      <!-- ===== 상품 등록·수정 ===== -->
+      <section class="view" id="view-products">
+        <div class="flex flex-wrap items-center justify-between gap-3">
+          <span class="tnum text-[13px] font-semibold text-mocha">총 <b class="text-espresso" id="prodCount">0</b>개 · 홈페이지에는 활성화된 상품만 보여요</span>
+          <button type="button" class="btn-p" onclick="newProduct()">+ 상품 추가</button>
+        </div>
+        <div class="mt-4 overflow-x-auto rounded-2xl border border-line bg-panel">
+          <table class="w-full min-w-[900px] text-left text-[13px]">
+            <thead><tr class="th"><th class="px-4 py-3 w-16">순서</th><th class="px-2 py-3">상품 카테고리</th><th class="px-2 py-3">상품명</th><th class="px-2 py-3">활성화</th><th class="px-2 py-3">품절</th><th class="px-2 py-3 text-right">정상가</th><th class="px-2 py-3 text-right">판매가</th><th class="px-4 py-3 text-right">관리</th></tr></thead>
+            <tbody class="divide-y divide-linesoft" id="prodBody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ===== 상품 수정 ===== -->
+      <section class="view" id="view-prodedit">
+        <div class="flex flex-wrap items-center justify-between gap-3">
+          <div class="flex items-center gap-2.5">
+            <button type="button" class="sig flex h-8 w-8 items-center justify-center rounded-full border border-line bg-panel text-mocha hover:text-espresso" onclick="showView('products')" aria-label="목록으로"><iconify-icon icon="solar:alt-arrow-left-linear" width="15"></iconify-icon></button>
+            <h2 class="text-[17px] font-bold" id="peHead">상품 수정</h2>
+          </div>
+          <div class="flex gap-2"><button type="button" class="btn" onclick="showView('products')">취소</button><button type="button" class="btn-p" onclick="saveProdEdit()">저장</button></div>
+        </div>
+        <div class="mt-4 rounded-2xl border border-line bg-panel px-5 py-4 text-[12.5px] leading-relaxed text-mocha">
+          <p class="flex items-start gap-2"><iconify-icon icon="solar:info-circle-linear" width="15" class="mt-0.5 shrink-0 text-rosewood"></iconify-icon>
+            <span class="break-keep"><b class="text-espresso">상품 등록 안내</b><br>지금은 홈페이지에 상품을 소개하고 「구매·상담 문의」로 연결돼요. 온라인 결제는 PG 계약 후 2단계에서 연결합니다. 한약·전문의약품은 광고·판매 규정을 꼭 확인해 주세요.</span></p>
+        </div>
+        <div class="mt-5 grid grid-cols-1 gap-5 lg:grid-cols-2">
+          <div class="card">
+            <label class="lbl">상품명 <span class="text-bad">*</span><input id="peName" type="text" maxlength="60" class="inp"></label>
+            <p class="mt-5 text-[12.5px] font-bold">상품 이미지 <span class="ml-1 font-medium text-mocha">첫 번째 사진이 대표 이미지예요 (최대 10장)</span></p>
+            <div id="peImgs" class="mt-3 grid grid-cols-4 gap-2.5 sm:grid-cols-5"></div>
+          </div>
+          <div class="card">
+            <label class="lbl">짧은 설명 <span class="text-bad">*</span><textarea id="peDesc" rows="3" maxlength="200" class="ta"></textarea></label>
+            <p class="hint">목록에 보이는 한두 줄 설명이에요. 주요 키워드를 넣으면 검색 노출에 유리해요.</p>
+            <div class="mt-5 space-y-3.5 text-[12.5px]">
+              <div class="flex flex-wrap items-center gap-3"><span class="w-24 font-bold text-mocha">카테고리</span>
+                <input id="peCat" list="peCatList" class="h-[40px] rounded-xl border border-line bg-ivory/50 px-3.5 text-[12.5px] font-medium"><datalist id="peCatList"></datalist></div>
+              <div class="flex items-center gap-3"><span class="w-24 font-bold text-mocha">판매 상태</span><div class="seg flex overflow-hidden rounded-xl border border-line" id="peOn"><button type="button" data-v="1">활성화</button><button type="button" data-v="0">비활성화</button></div></div>
+              <div class="flex items-center gap-3"><span class="w-24 font-bold text-mocha">품절 여부</span><div class="seg flex overflow-hidden rounded-xl border border-line" id="peSold"><button type="button" data-v="0">재고 있음</button><button type="button" data-v="1">품절</button></div></div>
+              <div class="flex items-center gap-3"><span class="w-24 font-bold text-mocha">과세 유형</span><div class="seg flex overflow-hidden rounded-xl border border-line" id="peTax"><button type="button" data-v="과세">과세</button><button type="button" data-v="면세">면세</button></div></div>
+            </div>
+            <div class="mt-6 grid grid-cols-2 gap-3">
+              <label class="lbl">정상가<input id="pePrice" type="text" inputmode="numeric" class="inp tnum"><p class="hint tnum" id="peSupply1"></p></label>
+              <label class="lbl">판매가<input id="peSale" type="text" inputmode="numeric" class="inp tnum"><p class="hint tnum" id="peSupply2"></p></label>
+            </div>
+            <p class="hint">판매가가 정상가보다 낮으면 홈페이지에 할인율이 표시돼요. 가격을 비우면 가격 없이 소개만 보여요.</p>
+          </div>
+        </div>
+        <div class="card mt-5">
+          <p class="text-[13.5px] font-bold">상품 상세 내용 <span class="ml-1 text-[12px] font-medium text-mocha">상품을 눌렀을 때 아래쪽에 보이는 본문이에요</span></p>
+          <input id="peCTitle" type="text" maxlength="100" placeholder="본문 제목 (선택)" class="mt-4 w-full bg-transparent text-[20px] font-bold placeholder:text-faint focus:outline-none">
+          <div class="mt-2 flex flex-wrap items-center gap-1 border-y border-linesoft py-1.5" data-toolbar="peBody"></div>
+          <div id="peBody" contenteditable="true" class="rich min-h-[200px] py-5 focus:outline-none" data-placeholder="상품 설명을 입력하세요. 사진·영상도 넣을 수 있어요."></div>
+        </div>
+        <div class="card mt-5">
+          <p class="flex flex-wrap items-center gap-2 text-[13.5px] font-bold">주요 정보 입력 <span class="text-[12px] font-medium text-mocha">채운 항목만 홈페이지에 표시돼요. 허위·과장 없는 정확한 정보를 적어 주세요.</span></p>
+          <div class="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
+            <label class="lbl">주요 성분<input id="peIng" maxlength="100" class="inp"></label>
+            <label class="lbl">상품 용량<input id="peVol" maxlength="100" class="inp"></label>
+            <label class="lbl">상품 효과<input id="peEff" maxlength="100" class="inp"></label>
+            <label class="lbl">사용 기한 · 보관<input id="peExp" maxlength="100" class="inp"></label>
+            <label class="lbl md:col-span-2">기타 사항<input id="peEtc" maxlength="100" class="inp"></label>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== 배송·환불 ===== -->
+      <section class="view" id="view-shipping">
+        <div class="rounded-2xl border border-warn/25 bg-warnbg px-5 py-4 text-[12.5px] leading-relaxed text-warn">
+          <p class="font-bold">작성 가이드</p>
+          <p class="break-keep mt-1.5">전자상거래법 및 소비자 보호를 위해 홈페이지에 고지해야 할 사항입니다. 작성 내용은 모든 상품 상세 화면 아래에 공통으로 표시됩니다.</p>
+        </div>
+        <div class="mt-5 space-y-5">
+          <div class="card"><label class="lbl text-[13px]">배송 안내<textarea id="shShip" rows="5" class="ta"></textarea></label></div>
+          <div class="card"><label class="lbl text-[13px]">주문 취소 안내<textarea id="shCancel" rows="3" class="ta"></textarea></label></div>
+          <div class="card"><label class="lbl text-[13px]">교환/반품 안내<textarea id="shRefund" rows="3" class="ta"></textarea></label></div>
+          <div class="flex justify-end"><button type="button" class="btn-p px-6 py-2.5" onclick="saveShipping()">저장</button></div>
+        </div>
+      </section>
+
+      <!-- ===== 방문 통계 ===== -->
+      <section class="view" id="view-stats">
+        <div class="flex flex-wrap items-center justify-between gap-3">
+          <p class="text-[13px] text-mocha">홈페이지 방문 기록 (개인정보 없이 익명으로 셉니다)</p>
+          <div class="flex items-center gap-2 text-[12.5px] font-semibold">
+            <div class="seg flex overflow-hidden rounded-xl border border-line bg-panel" id="statDays"><button type="button" data-v="14">14일</button><button type="button" data-v="30">30일</button><button type="button" data-v="90">90일</button></div>
+            <span class="tnum rounded-xl border border-line bg-panel px-3.5 py-2 text-mocha" id="statRange"></span>
+          </div>
+        </div>
+        <div class="mt-5 grid grid-cols-2 gap-4 md:grid-cols-4">
+          <div class="card p-5"><p class="text-[12px] font-semibold text-mocha">기간 방문수</p><p class="tnum mt-1 text-[21px] font-extrabold" id="stSum">-</p></div>
+          <div class="card p-5"><p class="text-[12px] font-semibold text-mocha">기간 순 방문자(일별 합)</p><p class="tnum mt-1 text-[21px] font-extrabold" id="stUni">-</p></div>
+          <div class="card p-5"><p class="text-[12px] font-semibold text-mocha">하루 평균 방문</p><p class="tnum mt-1 text-[21px] font-extrabold" id="stAvg">-</p></div>
+          <div class="card p-5"><p class="text-[12px] font-semibold text-mocha">가장 많은 날</p><p class="tnum mt-1 text-[21px] font-extrabold" id="stMax">-</p></div>
+        </div>
+        <div class="card mt-4">
+          <div class="flex items-center justify-between text-[12px] font-semibold text-mocha"><span>일별 방문 추이</span><span class="flex items-center gap-4"><span class="flex items-center gap-1.5"><i class="h-2.5 w-2.5 rounded-sm bg-rosewood"></i>방문수</span><span class="flex items-center gap-1.5"><i class="h-2.5 w-2.5 rounded-sm bg-champagne"></i>순 방문자</span></span></div>
+          <div class="mt-6 flex h-56 items-end gap-[2px] sm:gap-1" id="chart"></div>
+          <div class="mt-2 flex text-center text-[10px] font-medium text-faint" id="chartLabels"></div>
+        </div>
+        <div class="card mt-4">
+          <p class="text-[14px] font-bold">많이 본 게시글</p>
+          <ol class="mt-3 divide-y divide-linesoft text-[13px]" id="topPosts"></ol>
+        </div>
+      </section>
+
+      <!-- ===== 직원 계정 관리 ===== -->
+      <section class="view" id="view-staff">
+        <div class="flex flex-wrap items-end justify-between gap-3">
+          <div><h2 class="text-[17px] font-bold">직원 계정 관리</h2>
+            <p class="mt-1 break-keep text-[13px] text-mocha">직원은 로그인 화면의 「관리자 신청」으로 신청하고, 원장님(최고관리자)이 여기서 승인합니다.</p></div>
+          <button type="button" class="btn" onclick="loadStaff()"><iconify-icon icon="solar:refresh-linear" width="14"></iconify-icon>새로고침</button>
+        </div>
+        <div class="mt-4 grid grid-cols-1 gap-3 text-[12.5px] md:grid-cols-3">
+          <div class="rounded-xl border border-line bg-panel px-4 py-3"><b>최고관리자</b><span class="block text-mocha">모든 기능 + 직원 승인·등급 변경</span></div>
+          <div class="rounded-xl border border-line bg-panel px-4 py-3"><b>관리자</b><span class="block text-mocha">홈페이지 내용 수정 + 상담 관리</span></div>
+          <div class="rounded-xl border border-line bg-panel px-4 py-3"><b>직원</b><span class="block text-mocha">상담·예약 확인만 (내용 수정 불가)</span></div>
+        </div>
+        <div class="mt-4 overflow-x-auto rounded-2xl border border-line bg-panel" id="staffWrap"></div>
+      </section>
+
+      <!-- ===== 설정 (의원 정보) ===== -->
+      <section class="view" id="view-settings">
+        <div class="flex flex-wrap items-end justify-between gap-3">
+          <div><h2 class="text-[17px] font-bold">설정 · 의원 정보</h2><p class="mt-1 text-[13px] text-mocha">홈페이지 곳곳(첫 화면, 의원 정보, 맨 아래)에 쓰이는 정보예요.</p></div>
+          <button type="button" class="btn-p" onclick="saveSettings()">저장</button>
+        </div>
+        <div class="mt-5 grid grid-cols-1 gap-5 xl:grid-cols-2">
+          <div class="card grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <p class="text-[14px] font-bold sm:col-span-2">기본 정보</p>
+            <label class="lbl">상호명<input id="sName" class="inp"></label>
+            <label class="lbl">대표자<input id="sCeo" class="inp"></label>
+            <label class="lbl sm:col-span-2">주소<input id="sAddr" class="inp"></label>
+            <label class="lbl">전화번호<input id="sPhone" class="inp"></label>
+            <label class="lbl">사업자등록번호<input id="sBiz" class="inp"></label>
+            <label class="lbl">위치 한 줄 (첫 화면)<input id="sNear" class="inp" placeholder="화정역 도보 3분"></label>
+            <label class="lbl">진료시간 한 줄 (첫 화면)<input id="sHoursShort" class="inp"></label>
+          </div>
+          <div class="card space-y-4">
+            <div class="flex items-center justify-between"><p class="text-[14px] font-bold">진료시간표</p><button type="button" class="btn" onclick="addHour()">+ 줄 추가</button></div>
+            <div id="sHours" class="space-y-2"></div>
+            <label class="lbl">안내 문구<textarea id="sNote" rows="2" class="ta"></textarea></label>
+            <label class="lbl">휴진<input id="sClosed" class="inp"></label>
+          </div>
+          <div class="card space-y-4">
+            <p class="text-[14px] font-bold">예약·상담 링크</p>
+            <label class="lbl">네이버 예약 주소<input id="sNaver" class="inp" placeholder="https://booking.naver.com/..."><span class="hint block">비워 두면 네이버 예약 버튼이 숨겨져요.</span></label>
+            <label class="lbl">카카오톡 채널 주소<input id="sKakao" class="inp" placeholder="https://pf.kakao.com/..."><span class="hint block">비워 두면 카카오톡 버튼이 숨겨져요.</span></label>
+            <label class="lbl">지도 주소 (네이버 지도 공유 링크)<input id="sMap" class="inp"></label>
+            <div><span class="lbl">지도 자리 사진</span><div class="mt-2 flex items-center gap-3"><img id="sMapImg" alt="" class="h-16 w-24 rounded-xl bg-linesoft object-cover"><button type="button" class="btn" onclick="pickTo('sMapImg')">사진 바꾸기</button></div><p class="hint">지도 화면을 캡처해서 올리면 좋아요.</p></div>
+          </div>
+          <div class="card space-y-4">
+            <p class="text-[14px] font-bold">맨 아래 안내 페이지</p>
+            <label class="lbl">비급여 진료 비용<textarea id="sFees" rows="4" class="ta" placeholder="예) 공진단 1환 00,000원 ..."></textarea><span class="hint block">의료법상 비급여 비용은 홈페이지에 게시해야 해요. 비워 두면 링크가 숨겨져요.</span></label>
+            <label class="lbl">이용약관<textarea id="sTerms" rows="3" class="ta"></textarea></label>
+            <label class="lbl">개인정보 처리방침 추가 문구 <span class="font-normal text-faint">(기본 안내는 자동으로 표시)</span><textarea id="sPrivacy" rows="3" class="ta"></textarea></label>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+</div>
+
+<!-- ===== 게시판 이동 ===== -->
+<dialog id="moveModal" class="w-[92vw] max-w-md rounded-3xl border border-line bg-panel p-0 shadow-2xl">
+  <div class="p-7">
+    <p class="text-[15.5px] font-bold">이동할 게시판을 선택해 주세요</p>
+    <p class="mt-1 text-[12.5px] text-mocha" id="movePostName"></p>
+    <div class="mt-4 space-y-1 rounded-2xl border border-line p-2 text-[13.5px] font-medium" id="moveList"></div>
+    <div class="mt-5 flex justify-end gap-2">
+      <button type="button" class="btn" onclick="moveModal.close()">취소</button>
+      <button type="button" class="btn-p" id="moveConfirm">이동</button>
+    </div>
+  </div>
+</dialog>
+
+<!-- ===== 상담 직접 등록 ===== -->
+<dialog id="quickModal" class="w-[92vw] max-w-md rounded-3xl border border-line bg-panel p-0 shadow-2xl">
+  <form class="space-y-3 p-7" id="quickForm">
+    <p class="text-[15.5px] font-bold">상담·예약 직접 등록</p>
+    <p class="text-[12.5px] text-mocha">전화로 받은 상담 등을 기록해 두세요.</p>
+    <input name="name" required maxlength="30" placeholder="이름" class="inp">
+    <input name="phone" required maxlength="20" placeholder="연락처" class="inp">
+    <textarea name="memo" rows="3" maxlength="500" placeholder="메모 (예: 9/30 오후 3시 방문 예약)" class="ta"></textarea>
+    <div class="flex justify-end gap-2 pt-2"><button type="button" class="btn" onclick="quickModal.close()">취소</button><button class="btn-p">등록</button></div>
+  </form>
+</dialog>
+
+<!-- ===== 상담 메모 ===== -->
+<dialog id="memoModal" class="w-[92vw] max-w-md rounded-3xl border border-line bg-panel p-0 shadow-2xl">
+  <div class="space-y-3 p-7">
+    <p class="text-[15.5px] font-bold">상담 메모</p>
+    <p class="text-[12.5px] text-mocha" id="memoWho"></p>
+    <textarea id="memoText" rows="5" maxlength="500" class="ta"></textarea>
+    <div class="flex justify-end gap-2 pt-2"><button type="button" class="btn" onclick="memoModal.close()">취소</button><button type="button" class="btn-p" id="memoSave">저장</button></div>
+  </div>
+</dialog>
+
+<!-- ===== 게시글 편집기 ===== -->
+<dialog id="editorModal" class="h-[94dvh] w-[96vw] max-w-5xl rounded-3xl border border-line bg-panel p-0 shadow-2xl">
+  <div class="flex h-full flex-col">
+    <div class="flex items-center justify-between gap-4 border-b border-linesoft px-6 py-4">
+      <p class="flex flex-wrap items-center gap-3 text-[14px] font-bold"><span id="edHead">게시글 작성</span>
+        <span class="flex items-center gap-1.5 text-[12px] font-medium text-mocha"><iconify-icon icon="solar:danger-circle-linear" width="14"></iconify-icon> 의료광고 심의 기준(치료 효과 보장·과장 금지)을 확인해 주세요.</span></p>
+      <button type="button" class="sig text-faint hover:text-espresso" onclick="closeEditor()" aria-label="닫기"><iconify-icon icon="solar:close-circle-linear" width="24"></iconify-icon></button>
+    </div>
+    <div class="flex-1 overflow-y-auto px-6 py-6 sm:px-12">
+      <div class="mx-auto max-w-2xl">
+        <div class="flex flex-wrap items-center gap-3 rounded-2xl bg-ivory/70 px-4 py-3 text-[12.5px] font-semibold">
+          <label class="flex items-center gap-2 text-mocha">게시판 <select id="edBoard" class="rounded-xl border border-line bg-panel px-3 py-1.5 text-espresso"></select></label>
+          <label class="flex items-center gap-2 text-mocha">발행일 <input id="edDate" type="date" class="rounded-xl border border-line bg-panel px-2.5 py-1 text-espresso"></label>
+          <label class="flex items-center gap-2 text-mocha">공개 <button type="button" class="toggle on" id="edPub" role="switch" aria-checked="true"></button></label>
+        </div>
+        <p class="mt-3 break-keep text-[12px] text-faint" id="edBoardHint"></p>
+        <textarea id="edTitle" rows="2" maxlength="100" placeholder="제목을 입력하세요" class="mt-4 w-full resize-none bg-transparent text-[24px] font-extrabold leading-snug focus:outline-none"></textarea>
+        <p class="tnum text-right text-[12px] font-medium text-faint"><span id="edTitleCount">0</span> / 100</p>
+        <textarea id="edSub" rows="2" maxlength="300" placeholder="요약 문구 (홈페이지 카드에 보이는 설명)" class="mt-1 w-full resize-none bg-transparent text-[14.5px] text-mocha focus:outline-none"></textarea>
+        <div class="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-[auto_1fr]">
+          <div><span class="lbl">대표 사진</span>
+            <div class="mt-2 flex items-center gap-2"><img id="edCover" alt="" class="h-20 w-28 rounded-xl bg-linesoft object-cover"><div class="flex flex-col gap-1.5"><button type="button" class="btn py-1.5" onclick="pickTo('edCover')">사진 선택</button><button type="button" class="btn py-1.5" onclick="edCover.removeAttribute('src')">빼기</button></div></div></div>
+          <label class="lbl">작은 머리말 <span class="font-normal text-faint">(선택 · 예: Launch Event)</span><input id="edTag" maxlength="30" class="inp"></label>
+        </div>
+        <label class="lbl mt-3" id="edPointsWrap">체크 항목 <span class="font-normal text-faint">(집중 진료 영역 · 한 줄에 하나)</span><textarea id="edPoints" rows="3" class="ta"></textarea></label>
+        <hr class="mt-5 border-espresso/40">
+        <div class="sticky top-0 z-10 mt-3 flex flex-wrap items-center gap-1 rounded-xl border border-line bg-panel/95 p-1 backdrop-blur" data-toolbar="edBody"></div>
+        <div id="edBody" contenteditable="true" class="rich mt-4 min-h-[300px] pb-10 focus:outline-none" data-placeholder="본문을 입력하세요. 위 도구로 사진·영상·링크를 넣을 수 있어요."></div>
+      </div>
+    </div>
+    <div class="flex flex-wrap items-center justify-between gap-3 border-t border-linesoft px-6 py-4">
+      <button type="button" class="btn-d" id="edDelete">삭제</button>
+      <div class="flex flex-wrap items-center gap-2">
+        <button type="button" class="btn" onclick="closeEditor()">취소</button>
+        <button type="button" class="btn-p px-6 py-2.5" onclick="saveEditor()">저장 · 게시</button>
+      </div>
+    </div>
+  </div>
+</dialog>
+
+<div id="toast" class="pointer-events-none fixed bottom-6 left-1/2 z-[100] -translate-x-1/2 translate-y-4 rounded-full bg-espresso px-5 py-2.5 text-[13px] font-semibold text-ivory opacity-0 shadow-xl"></div>
+
+<script src="admin-app.js"></script>
+</body>
+</html>
