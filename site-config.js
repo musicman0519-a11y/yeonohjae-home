@@ -7,7 +7,7 @@
    ※ Publishable key 는 공개돼도 괜찮은 키입니다. (secret / service_role 키는 절대 넣지 마세요)
    ========================================================================= */
 window.SITE_CONFIG = {
-  SUPABASE_URL: 'https://여기에-새-프로젝트-주소.supabase.co',
-  SUPABASE_KEY: 'sb_publishable_여기에-새-키',
+  SUPABASE_URL: 'https://lussfeezminlzaezgzhv.supabase.co',
+  SUPABASE_KEY: 'sb_publishable_qMAvyJsLBUCtPLpgDdyjww_ob-cwLqs',
   SITE_URL:     'https://새-사이트-주소.vercel.app'
 };
